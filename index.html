@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Aircraft vectoring</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body id="body">
+  <div class="progress-bar">
+    <div class="level-bar level-1 state-0"><span>1</span></div>
+    <div class="level-bar level-2 state-0"><span>2</span></div>
+    <div class="level-bar level-3 state-0"><span>3</span></div>
+    <div class="level-bar level-4 state-0"><span>4</span></div>
+    <div class="level-bar level-5 state-0"><span>5</span></div>
+  </div>
+  <div class="info">
+    <p class="overall">Попыток <span>0</span></p>
+    <p class="percent">Точность <span>0%</span></p>
+  </div>
+  <canvas id="field"></canvas>
+  <select class="select-level">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select>
+  <div class="keyboard-container">
+    <div class="keyboard-display">000</div>
+    <button class="keyboard-key" value="9">9</button>
+    <button class="keyboard-key" value="8">8</button>
+    <button class="keyboard-key" value="7">7</button>
+    <button class="keyboard-key" value="6">6</button>
+    <button class="keyboard-key" value="5">5</button>
+    <button class="keyboard-key" value="4">4</button>
+    <button class="keyboard-key" value="3">3</button>
+    <button class="keyboard-key" value="2">2</button>
+    <button class="keyboard-key" value="1">1</button>
+    <button class="keyboard-key keyboard-enter" value="enter">Ввод</button>
+    <button class="keyboard-key keyboard-reset" value="reset">Сброс</button>
+    <button class="keyboard-key" value="0">0</button>
+  </div>
+  <script src="indexown.js"></script>
+</body>
+</html>
