@@ -23,7 +23,7 @@ var airplane = {
 };
 var miniMap ={
   xb: width-400,
-  yb: height*2/3,
+  yb: height-(400*height/width),
   xviszf: null,
   xviszs: null,
   yviszf: null,
@@ -125,7 +125,6 @@ function drawAp(airports){
     ctx.save();
     ctx.beginPath();
     ctx.lineWidth = 1;
-    ctx.fillStyle = '#ffbe00';
     var newCoordinate = null;
     if (airports.length==0)
     {
@@ -136,6 +135,11 @@ function drawAp(airports){
     }
     for (i=0;i<airports.length;i++)
     {
+      ctx.fillStyle = '#ffbe00';
+      if (airports[i].collision)
+      {
+        ctx.fillStyle = "#00ff00";
+      }
       ctx.arc(airports[i].mmx,airports[i].mmy, 3, 0, Math.PI * 2, true);
       ctx.fill();
       if (airports[i].mmx<=miniMap.xviszs&&airports[i].mmx>=miniMap.xviszf&&airports[i].mmy>=miniMap.yviszf&&airports[i].mmy<=miniMap.yviszs)
@@ -143,7 +147,13 @@ function drawAp(airports){
         ctx.save();
         ctx.beginPath();
         ctx.translate(airplane.x,airplane.y);
-        ctx.arc((airports[i].mmx-airplane.mmx)*10,(airports[i].mmy-airplane.mmy)*10,5,0,2*Math.PI,true);
+        airports[i].x = (airports[i].mmx-airplane.mmx)*10;
+        airports[i].y = (airports[i].mmy-airplane.mmy)*10;
+        ctx.arc(airports[i].x,airports[i].y,5,0,2*Math.PI,true);
+        if (Math.abs(airports[i].x-0)<=3&&Math.abs(airports[i].y-0)<=3)
+        {
+          airports[i].collision=true;
+        }
         ctx.fill();
         ctx.restore();
       }
@@ -164,24 +174,35 @@ function drawAirplane(airplane)
   {
     //v = prompt("Введите скорость в км/ч",0);
     //airplane.v = (v*km)/(3600*60);
-    airplane.v = 500*km/3600/60/10;
+    airplane.v = 15500*km/3600/60/10;
   }
   airplane.angle = userInputInt;
   if (airplane.mmx===null||airplane.mmy===null)
   {
     airplane.mmx = (width-miniMap.xb)/2+miniMap.xb;
-    airplane.mmy = miniMap.yb+(height-miniMap.yb)*0.95;
+    airplane.mmy = miniMap.yb+(height-miniMap.yb)*0.90;
   }
   if (airplane.angle!==null)
   {
-    newCoordinate = getCoordsByAngleRadius({x: airplane.mmx,y:airplane.mmy},airplane.angle,airplane.v)
-    airplane.mmx = newCoordinate.x;
-    airplane.mmy = newCoordinate.y;
+    newCoordinate = getCoordsByAngleRadius({x: airplane.mmx,y:airplane.mmy},airplane.angle,airplane.v);
+    if (!(newCoordinate.x - miniMap.xb <=1||newCoordinate.x - width >=-1||newCoordinate.y - miniMap.yb<=1||newCoordinate.y - height>=-1))
+    {
+      airplane.mmx = newCoordinate.x;
+      airplane.mmy = newCoordinate.y;
+    }
   }
   miniMap.xviszf = airplane.mmx - (width-miniMap.xb)/10;
   miniMap.xviszs = airplane.mmx + (width-miniMap.xb)/10;
   miniMap.yviszf = airplane.mmy - (height-miniMap.yb)/10;
   miniMap.yviszs = airplane.mmy + (height-miniMap.yb)/10;
+  if (miniMap.xviszf<=miniMap.xb)
+  {
+    miniMap.xviszf=miniMap.xb;
+  }
+  if (miniMap.yviszf<=miniMap.yb)
+  {
+    miniMap.yviszf=miniMap.yb;
+  }
   ctx.beginPath();
   ctx.moveTo(miniMap.xviszf,miniMap.yviszf);
   ctx.lineTo(miniMap.xviszs,miniMap.yviszf);
@@ -254,6 +275,7 @@ function changeProgressBar(state, direction) {
 function Airport(){
   this.x = null;
   this.y = null;
+  this.angle = null;//уровни сложнсоти и угол 
   this.collision = false;
   this.mmx = getRandomInt(miniMap.xb,width);
   this.mmy = getRandomInt(miniMap.yb,height);
@@ -312,6 +334,7 @@ document.addEventListener('keydown', function(e) {
   if (e.which === 13) {
     if (userInput % 5 === 0 && userInput >= 0 && userInput < 361) {
       userInputInt=parseInt(userInput);
+      //userInput = '000';
     } else {
       cancelAnimationFrame(animation);
       drawText('Значение угла должно быть кратно 5 и не больше 360°');
