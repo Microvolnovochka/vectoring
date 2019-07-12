@@ -140,7 +140,12 @@ function drawAp(airports){
       ctx.fill();
       if (airports[i].mmx<=miniMap.xviszs&&airports[i].mmx>=miniMap.xviszf&&airports[i].mmy>=miniMap.yviszf&&airports[i].mmy<=miniMap.yviszs)
       {
-        console.log("sssssssssss");
+        ctx.save();
+        ctx.beginPath();
+        ctx.translate(airplane.x,airplane.y);
+        ctx.arc((airports[i].mmx-airplane.mmx)*10,(airports[i].mmy-airplane.mmy)*10,5,0,2*Math.PI,true);
+        ctx.fill();
+        ctx.restore();
       }
     }
     ctx.restore();
