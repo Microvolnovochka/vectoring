@@ -9,6 +9,7 @@ var userInput = "000";
 //var coin = null;
 var sucess = false;
 var km = 50;
+var cren = 0.5437*2;
 var randomAngle = null;
 var randomDistance = null;
 var lastRandomAngle = null;
@@ -148,8 +149,8 @@ function drawAp(airports){
         ctx.strokeStyle = "#ffffff";
         ctx.translate(airports[i].mmx,airports[i].mmy);
         ctx.rotate(airports[i].angle*Math.PI/180);
-        ctx.moveTo(10,0);
-        ctx.lineTo(-10,0);
+        ctx.moveTo(0,10);
+        ctx.lineTo(0,-10);
         ctx.stroke();
         ctx.restore();
       }
@@ -169,8 +170,8 @@ function drawAp(airports){
           ctx.lineWidth = 5;
           ctx.translate(airports[i].x,airports[i].y);
           ctx.rotate(airports[i].angle*Math.PI/180);
-          ctx.moveTo(50,0);
-          ctx.lineTo(-50,0);
+          ctx.moveTo(0,50);
+          ctx.lineTo(0,-50);
           ctx.stroke();
           ctx.restore();
         }
@@ -208,9 +209,31 @@ function drawAirplane(airplane)
   {
     //v = prompt("Введите скорость в км/ч",0);
     //airplane.v = (v*km)/(3600*60);
-    airplane.v = 1000*km/3600/60/10;
+    airplane.v = 500*km/3600/60/10;
   }
-  airplane.angle = userInputInt;
+  if(airplane.angle>=360)
+  {
+    airplane.angle-=360;
+  } 
+  else if (airplane.angle<0)
+  {
+    airplane.angle+=360;
+  } 
+  if(Math.abs(airplane.angle-userInputInt)>1)
+  {
+    if (((airplane.angle+180)>=userInputInt&&userInputInt>airplane.angle)||((airplane.angle-180)>=userInputInt&&userInputInt>(airplane.angle-360)))
+    {
+      airplane.angle+=cren/60;
+    }
+    else
+    {
+      airplane.angle-=cren/60;
+    }
+  }
+  else
+  {
+    airplane.angle=userInputInt;
+  }
   if (airplane.mmx===null||airplane.mmy===null)
   {
     airplane.mmx = (width-miniMap.xb)/2+miniMap.xb;
