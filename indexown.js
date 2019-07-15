@@ -33,39 +33,34 @@ var miniMap ={
 };
 var airports = [];
 var progressBar = {
-  level: 3,
+  level: 4,
   count: 0
 };
 var levels = {
   1: {
-    center: true,
     petals: 12,
     airpotrN: 2,
     difficulty: 0,
   },
   2: {
-    center: true,
     petals: 4,
     airpotrN: 2,
     difficulty: 0,
   },
   3: {
-    center: true,
     petals: 4,
-    airpotrN: 4,
+    airpotrN: 2,
     difficulty: 1,
   },
   4: {
-    center: true,
-    petals: 0,
-    airpotrN: 4,
-    difficulty: 1,
+    petals: 4,
+    airpotrN: 2,
+    difficulty: 2,
   },
   5: {
-    center: false,
     petals: 0,
-    airpotrN: 5,
-    difficulty: 1,
+    airpotrN: 2,
+    difficulty: 2,
   }
 };
 ctx.lineWidth = 1;
@@ -151,6 +146,11 @@ function drawAp(airports){
         ctx.rotate(airports[i].angle*Math.PI/180);
         ctx.moveTo(0,10);
         ctx.lineTo(0,-10);
+        if (levels[progressBar.level].difficulty==2)
+        {
+          ctx.moveTo(5,5);
+          ctx.lineTo(-5,5);
+        }
         ctx.stroke();
         ctx.restore();
       }
@@ -172,6 +172,11 @@ function drawAp(airports){
           ctx.rotate(airports[i].angle*Math.PI/180);
           ctx.moveTo(0,50);
           ctx.lineTo(0,-50);
+          if (levels[progressBar.level].difficulty==2)
+          {
+            ctx.moveTo(15,30);
+            ctx.lineTo(-15,30);
+          }
           ctx.stroke();
           ctx.restore();
         }
@@ -179,14 +184,21 @@ function drawAp(airports){
         {
           if(airports[i].angle!==null)
           {
-            if(Math.abs(airplane.angle-airports[i].angle)<=10||Math.abs(airplane.angle-(airports[i].angle-180))<=10)
+            if (levels[progressBar.level].difficulty==2)
             {
-              airports[i].collision=true;
+              if (Math.abs(airplane.angle-airports[i].angle)<=10)
+              {
+                airports[i].collision = true;
+              }
+            }
+            else if(Math.abs(airplane.angle-airports[i].angle)<=10||Math.abs(airplane.angle-(airports[i].angle-180))<=10)
+            {
+              airports[i].collision = true;
             }
           }
           else
           {
-            airports[i].collision=true;
+            airports[i].collision = true;
           }
         }
         ctx.fill();
@@ -358,8 +370,8 @@ function Airport(){
   this.y = null;
   this.angle = null;//уровни сложнсоти и угол 
   this.collision = false;
-  this.mmx = getRandomInt(miniMap.xb,width);
-  this.mmy = getRandomInt(miniMap.yb,height);
+  this.mmx = getRandomInt(miniMap.xb+20,width-20);
+  this.mmy = getRandomInt(miniMap.yb+20,height-20);
   while (this.mmy==airplane.mmy&&this.mmx==irplane.mmx)
   {
     this.mmx = getRandomInt(miniMap.xb,width);
@@ -367,7 +379,7 @@ function Airport(){
   }
   if (levels[progressBar.level].difficulty)
   {
-    this.angle = getRandomAngle(0,360,null);
+    this.angle = getRandomInt(0,71)*5;
   }
 }
 
