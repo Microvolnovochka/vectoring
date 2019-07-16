@@ -6,33 +6,69 @@ var width = ctx.canvas.width = window.innerWidth;
 var height = ctx.canvas.height = window.innerHeight - 1;
 var userInputInt = null;
 var userInput = "000";
-//var coin = null;
 var sucess = false;
-var km = 50;
-var cren = 0.5437*100;
+var km = 300/50;//количество пикселей в одном километре
+var coefx = (width-300*2)/(300)*5;
+var coefy = height/(300)*5;
 var randomAngle = null;
-var veloc = 3000;
+var count = 0;//счетчик для отрисовки пути
+var veloc = 100;//скорость в км/ч
 var randomDistance = null;
 var lastRandomAngle = null;
 var plane = new Image();
+var airports = [];
+var pathpoints = [];
 var airplane = {
   x: width/2,
   y: height/2,
   mmx: null,
   mmy: null,
   v: null,
+  anglev: null,
   angle: null,
 };
 var miniMap ={
-  xb: width-400,
-  yb: height-(400*height/width),
+  xb: width-300,
+  yb: height-310,
   xviszf: null,
   xviszs: null,
   yviszf: null,
   yviszs: null,
   color: "#302d2d",
 };
-var airports = [];
+var cren = {
+  15:{
+    1500: 0.3620,
+    1450: 0.3734,
+    1400: 0.3876,
+    1350: 0.4016,
+    1300: 0.4172,
+    1250: 0.4340,
+    1200: 0.4522,
+    1150: 0.4721,
+    1100: 0.4938,
+    1050: 0.5175,
+    1000: 0.5437,
+    950: 0.5726,
+    900: 0.6024,
+    850: 0.6381,
+    800: 0.6784,
+    750: 0.7241,
+    700: 0.7763,
+    650: 0.8367,
+    600: 0.9018,
+    550: 0.9843,
+    500: 1.0835,
+    450: 1.2049,
+    400: 1.3568,
+    350: 1.5527,
+    300: 1.8146,
+    250: 2.1827,
+    200: 2.7384,
+    150: 3.6374,
+    100: 5.5782,
+  },
+};
 var progressBar = {
   level: 1,
   count: 0,
@@ -76,7 +112,7 @@ if (localStorage.getItem('eris-value:theme') === 'gray') {
   ctx.strokeStyle = '#b9b9b9';
   ctx.fillStyle = 'white';
   plane.src = 'images/airplane-white.png';
-  document.querySelector('.progress-bar').style.color = 'white';
+ // document.querySelector('.progress-bar').style.color = 'white';
 } else {
   body.style.background = '#f0f5f9';
   body.style.color = 'black';
@@ -85,7 +121,7 @@ if (localStorage.getItem('eris-value:theme') === 'gray') {
   display.style.background = 'linear-gradient(#c9cac4, #7c9caf)';
   display.style.color = 'black';
   plane.src = 'images/airplane-black.png';
-  document.querySelector('.progress-bar').style.color = 'black';
+ // document.querySelector('.progress-bar').style.color = 'black';
 }
 
 init();
@@ -98,23 +134,35 @@ function init() {
 
 function draw(time) {
   ctx.clearRect(0, 0, width, height);
+  drawVisualBox();
   drawMiniMap(miniMap);
   drawPetals(levels[progressBar.level]);
   outOfMap(airplane);
+  drawPath(pathpoints);
   drawAp(airports);
   drawAirplane(airplane);
   progressCheck(progressBar);
+  upgradeInfo();
   requestAnimationFrame(draw);
+}
+
+function drawVisualBox(){
+  ctx.save();
+  ctx.beginPath();
+  ctx.fillStyle = "#4f4b4b";
+  ctx.fillRect(0,0,300,height);
+  ctx.fillRect(width-301,0,301,height);
+  ctx.restore();
 }
 
 function drawMiniMap(miniMap){
   ctx.save();
   ctx.lineWidth = 2;
   ctx.fillStyle = miniMap.color;
-  ctx.moveTo(miniMap.xb,height);
+  ctx.moveTo(miniMap.xb,height-10);
   ctx.lineTo(miniMap.xb,miniMap.yb);
   ctx.lineTo(width,miniMap.yb);
-  ctx.lineTo(width,height);
+  ctx.lineTo(width,height-10);
   ctx.stroke();
   ctx.fill();
   ctx.restore();
@@ -164,8 +212,8 @@ function drawAp(airports){
         ctx.save();
         ctx.beginPath();
         ctx.translate(airplane.x,airplane.y);
-        airports[i].x = (airports[i].mmx-airplane.mmx)*10;
-        airports[i].y = (airports[i].mmy-airplane.mmy)*10;
+        airports[i].x = (airports[i].mmx-airplane.mmx)*((width-2*(width-miniMap.xb))/(width-miniMap.xb))*5;
+        airports[i].y = (airports[i].mmy-airplane.mmy)*(height/(height-miniMap.yb))*5;
         ctx.arc(airports[i].x,airports[i].y,15,0,2*Math.PI,true);
         if (airports[i].angle!==null)
         {
@@ -187,6 +235,11 @@ function drawAp(airports){
         ctx.fill();
         ctx.restore();
       }
+      else
+      {
+        airports[i].x = null;
+        airports[i].y = null;
+      }
     }
     ctx.restore();
 }
@@ -200,11 +253,11 @@ function drawAirplane(airplane)
   ctx.fillStyle = '#ff0000';
   ctx.beginPath();
   var newCoordinate = null;
-  if (airplane.v===null)
+  if (veloc!==null)
   {
     //v = prompt("Введите скорость в км/ч",0);
     //airplane.v = (v*km)/(3600*60);
-    airplane.v = veloc*km/3600/60/10;
+    airplane.v = (veloc*km)/3600/60;
   }
   if(airplane.angle>=360)
   {
@@ -218,11 +271,11 @@ function drawAirplane(airplane)
   {
     if (((airplane.angle+180)>=userInputInt&&userInputInt>airplane.angle)||((airplane.angle-180)>=userInputInt&&userInputInt>(airplane.angle-360)))
     {
-      airplane.angle+=cren/60;
+      airplane.angle+=cren["15"][veloc.toString()]/60;
     }
     else
     {
-      airplane.angle-=cren/60;
+      airplane.angle-=cren["15"][veloc.toString()]/60;
     }
   }
   else
@@ -232,9 +285,9 @@ function drawAirplane(airplane)
   if (airplane.mmx===null||airplane.mmy===null)
   {
     airplane.mmx = (width-miniMap.xb)/2+miniMap.xb;
-    airplane.mmy = miniMap.yb+(height-miniMap.yb)*0.90;
+    airplane.mmy = height - 10 -((height-miniMap.yb)/10);
   }
-  if (airplane.angle!==null)
+  if (airplane.angle!==null&&airplane.v!==null)
   {
     newCoordinate = getCoordsByAngleRadius({x: airplane.mmx,y:airplane.mmy},airplane.angle,airplane.v);
     airplane.mmx = newCoordinate.x;
@@ -252,6 +305,10 @@ function drawAirplane(airplane)
   {
     miniMap.yviszf=miniMap.yb;
   }
+  if (miniMap.yviszs>=height-10)
+  {
+    miniMap.yviszs=height-10;
+  }
   ctx.beginPath();
   ctx.moveTo(miniMap.xviszf,miniMap.yviszf);
   ctx.lineTo(miniMap.xviszs,miniMap.yviszf);
@@ -265,6 +322,45 @@ function drawAirplane(airplane)
   ctx.translate(airplane.x,airplane.y);
   ctx.rotate(airplane.angle*Math.PI/180);
   ctx.drawImage(plane,-20,-20,40,40);
+  ctx.restore();
+}
+
+function drawPath(pathpoints){
+  ctx.save();
+  ctx.fillStyle = "#00ff00";
+  if (!pathpoints.length)
+  {
+    pathpoints.push(new Point(airplane.mmx,airplane.mmy));
+  }
+  if (Math.sqrt(Math.pow((airplane.mmx-pathpoints[pathpoints.length-1].mmx),2)+Math.pow((airplane.mmy-pathpoints[pathpoints.length-1].mmy),2))>5)
+  {
+    pathpoints.push(new Point(airplane.mmx,airplane.mmy));
+  }
+  if (pathpoints.length)
+  {
+    for (var i=0;i<pathpoints.length;i++)
+    {
+      ctx.beginPath();
+      ctx.arc(pathpoints[i].mmx,pathpoints[i].mmy,1,0,Math.PI*2,true);
+      ctx.fill();
+      if (pathpoints[i].mmx<=miniMap.xviszs&&pathpoints[i].mmx>=miniMap.xviszf&&pathpoints[i].mmy>=miniMap.yviszf&&pathpoints[i].mmy<=miniMap.yviszs)
+      {
+        ctx.save();
+        ctx.beginPath();
+        ctx.translate(airplane.x,airplane.y);
+        pathpoints[i].x = (pathpoints[i].mmx-airplane.mmx)*((width-2*(width-miniMap.xb))/(width-miniMap.xb))*5;
+        pathpoints[i].y = (pathpoints[i].mmy-airplane.mmy)*(height/(height-miniMap.yb))*5;
+        ctx.arc(pathpoints[i].x,pathpoints[i].y,5,0,2*Math.PI,true);
+        ctx.fill();
+        ctx.restore();
+      }
+      else 
+      {
+        pathpoints[i].x = null;
+        pathpoints[i].y = null;
+      }
+    }
+  }
   ctx.restore();
 }
 
@@ -317,33 +413,38 @@ function outOfMap(airplane){
       airplane.mmx = width-1;
       airplane.mmy = airplane.mmy;
       airports.splice(0,airports.length);
+      pathpoints.splice(0,pathpoints.length);
   }
   else if (airplane.mmx>=width)
   {
       airplane.mmx = miniMap.xb+1;
       airplane.mmy = airplane.mmy;
       airports.splice(0,airports.length);
+      pathpoints.splice(0,pathpoints.length);
   }
   else if (airplane.mmy<=miniMap.yb)
   {
       airplane.mmx = airplane.mmx;
-      airplane.mmy = height-1;
+      airplane.mmy = height - 10;
       airports.splice(0,airports.length);
+      pathpoints.splice(0,pathpoints.length);
   }
-  else if (airplane.mmy>=height)
+  else if (airplane.mmy>=height-10)
   {
       airplane.mmx = airplane.mmx;
       airplane.mmy = miniMap.yb+1;
       airports.splice(0,airports.length);
+      pathpoints.splice(0,pathpoints.length);
   }
 }
 
 function progressCheck(progress){
-  if (progress.count>=1)
+  if (progress.count>=2)
   {
     progress.level++;
     progress.count = 0;
-    airports.splice(0,airports.length)
+    airports.splice(0,airports.length);
+    //здесь надо сделать визуал для повышения уровня
     return;
   }
   for (var i=0;i<airports.length;i++)
@@ -356,6 +457,7 @@ function progressCheck(progress){
   progress.count++;
   airports.splice(0,airports.length);
 }
+
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
@@ -390,6 +492,13 @@ function changeProgressBar(state, direction) {
   document.querySelector(selector).setAttribute('class', classes);
 }
 
+function Point(x,y){
+  this.mmx = x;
+  this.mmy = y;
+  this.x = null;
+  this.y = null;
+}
+
 function Airport(){
   this.x = null;
   this.y = null;
@@ -406,6 +515,12 @@ function Airport(){
   {
     this.angle = getRandomInt(0,71)*5;
   }
+}
+
+function upgradeInfo(){
+  document.querySelector('.cren > span').innerHTML = "15";
+  document.querySelector('.course > span').innerHTML = Math.floor(airplane.angle);
+  document.querySelector('.speed > span').innerHTML = veloc;
 }
 
 function isNumPad(e) {
@@ -426,6 +541,28 @@ function drawText(text) {
   ctx.fillText(text, width / 2, 70);
 }
 
+document.querySelector('.info').addEventListener('click',function(e){
+  if (e.target.id=="plusspeed")
+  {
+    veloc+=50;
+    if (veloc>1500)
+    {
+      veloc = 1500;
+      drawText("Скорость не должна превышать 1500 км/ч")
+    }
+  }
+  else if (e.target.id=="minusspeed")
+  {
+    veloc-=50;
+    if (veloc<100)
+    {
+      veloc = 100;
+      cancelAnimationFrame(animation);
+      drawText("Скорость не должна быть меньше 100 км/ч")
+    }
+  }
+});
+
 document.querySelector('.select-level').addEventListener('change', function (e) {
   progressBar.level = e.target.value;
   progressBar.count = e.target.value * 5;
@@ -440,9 +577,8 @@ document.querySelector('.keyboard-container').addEventListener('click', function
   } else if (e.target.value === 'enter') {
     if (userInput % 5 === 0 && userInput >= 0 && userInput < 361) {
       userInputInt=parseInt(userInput);
-      userInput ="000";
     } else {
-      cancelAnimationFrame(animation);
+      //cancelAnimationFrame(animation);
       drawText('Значение угла должно быть кратно 5 и не больше 360°');
       return;
     }
@@ -456,7 +592,7 @@ document.addEventListener('keydown', function(e) {
   if (e.which === 13) {
     if (userInput % 5 === 0 && userInput >= 0 && userInput < 361) {
       userInputInt=parseInt(userInput);
-        userInput = '000';
+        
     } else {
       cancelAnimationFrame(animation);
       drawText('Значение угла должно быть кратно 5 и не больше 360°');
@@ -474,6 +610,21 @@ document.addEventListener('keydown', function(e) {
     }
   } else if (isNumPad(e)) {
     userInput = '' + userInput.toString().slice(1) + (e.key ? e.key : e.keyIdentifier.slice(-1));
+  } else if (e.which==107||e.which==61) {
+    veloc+=50;
+    if (veloc>1500)
+    {
+      veloc = 1500;
+      drawText("Скорость не должна превышать 1500 км/ч")
+    }
+  } else if (e.which==109||e.which==173) {
+    veloc-=50;
+    if (veloc<100)
+    {
+      veloc = 100;
+      drawText("Скорость не должна быть меньше 100 км/ч")
+    }
   }
+
   display.textContent = userInput;
 });
