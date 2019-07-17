@@ -150,8 +150,8 @@ function drawVisualBox(){
   ctx.save();
   ctx.beginPath();
   ctx.fillStyle = "#4f4b4b";
-  ctx.fillRect(0,0,300,height);
-  ctx.fillRect(width-301,0,301,height);
+  ctx.fillRect(0,0,300,height-0);
+  ctx.fillRect(width-301,0,301,height-0);
   ctx.restore();
 }
 
@@ -332,9 +332,10 @@ function drawPath(pathpoints){
   {
     pathpoints.push(new Point(airplane.mmx,airplane.mmy));
   }
-  if (Math.sqrt(Math.pow((airplane.mmx-pathpoints[pathpoints.length-1].mmx),2)+Math.pow((airplane.mmy-pathpoints[pathpoints.length-1].mmy),2))>5)
+  if (count==180)
   {
     pathpoints.push(new Point(airplane.mmx,airplane.mmy));
+    count = 0;
   }
   if (pathpoints.length)
   {
@@ -349,7 +350,7 @@ function drawPath(pathpoints){
         ctx.beginPath();
         ctx.translate(airplane.x,airplane.y);
         pathpoints[i].x = (pathpoints[i].mmx-airplane.mmx)*((width-2*(width-miniMap.xb))/(width-miniMap.xb))*5;
-        pathpoints[i].y = (pathpoints[i].mmy-airplane.mmy)*(height/(height-miniMap.yb))*5;
+        pathpoints[i].y = (pathpoints[i].mmy-airplane.mmy)*(height/(height-miniMap.yb+10))*5;
         ctx.arc(pathpoints[i].x,pathpoints[i].y,5,0,2*Math.PI,true);
         ctx.fill();
         ctx.restore();
@@ -361,6 +362,7 @@ function drawPath(pathpoints){
       }
     }
   }
+  count++;
   ctx.restore();
 }
 
@@ -439,16 +441,26 @@ function outOfMap(airplane){
 }
 
 function progressCheck(progress){
-  if (progress.count>=2)
+  if (progress.count>=1)
   {
+    if (progress.level==5)
+    {
+      drawText("It's end of your journey");
+      cancelAnimationFrame(animation);
+      animation = requestAnimationFrame(draw);
+      progress.level = 1;
+      progress.count = 0;
+      return;
+    }
     progress.level++;
     progress.count = 0;
     airports.splice(0,airports.length);
-    //здесь надо сделать визуал для повышения уровня
+    pathpoints.splice(0,pathpoints.length);
     return;
   }
   for (var i=0;i<airports.length;i++)
   {
+    upgradeLevelInfo(airports);
     if (!airports[i].collision)
     {
       return;
@@ -481,17 +493,6 @@ function getCoordsByAngleRadius(center, angle, distance) {
       a
 }
 
-function changeProgressBar(state, direction) {
-  var selector = '.level-' + state.level;
-  if (state.level >= 1 && direction === 'up') {
-    var prevSelector = '.level-' + (state.level === 1 ? 1 : state.level-1);
-    var prevClasses = "level-bar" + " level-" + (state.level === 1 ? 1 : state.level - 1) + " state-5";
-    document.querySelector(prevSelector).setAttribute('class', prevClasses);
-  }
-  var classes = "level-bar" + " level-" + state.level + " state-" + (!direction || direction === 'up' ? state.count % 5 : (direction === 'end' ? 5 : 4));
-  document.querySelector(selector).setAttribute('class', classes);
-}
-
 function Point(x,y){
   this.mmx = x;
   this.mmy = y;
@@ -517,6 +518,30 @@ function Airport(){
   }
 }
 
+function upgradeLevelInfo(airports){
+  var par = document.querySelector(".levelsinfo");
+  var p = document.createElement("p");
+  var level = document.querySelector(".level"+String(progressBar.level));
+  if (level)
+  {
+    for (var i =0;i<levels[progressBar.level].airpotrN;i++)
+    {
+      level.querySelectorAll("span")[i].innerHTML = " Аэропорт №"+i.toString()+" - "+airports[i].collision.toString();
+    }
+  }
+  else 
+  {
+    for (var i =0;i<levels[progressBar.level].airpotrN;i++)
+    {
+      var span = document.createElement("span");
+      span.innerHTML = "Аэропорт №"+i.toString()+" - "+airports[i].collision.toString();
+      p.appendChild(span);
+    }
+    p.className = "level"+progressBar.level.toString();
+    par.appendChild(p);
+  }
+}
+
 function upgradeInfo(){
   document.querySelector('.cren > span').innerHTML = "15";
   document.querySelector('.course > span').innerHTML = Math.floor(airplane.angle);
@@ -528,13 +553,6 @@ function isNumPad(e) {
     return true;
   }
   return false;
-}
-
-function changeInfo() {
-  document.querySelector('.overall > span').innerHTML = overall.length;
-  document.querySelector('.percent > span').innerHTML = (overall.filter(function(el) {
-    return el > 0;
-  }).length / overall.length * 100).toFixed(1) + '%';
 }
 
 function drawText(text) {
@@ -565,7 +583,9 @@ document.querySelector('.info').addEventListener('click',function(e){
 
 document.querySelector('.select-level').addEventListener('change', function (e) {
   progressBar.level = e.target.value;
-  progressBar.count = e.target.value * 5;
+  progressBar.count = 0;
+  airports.splice(0,airports.length);
+  //progressBar.count = e.target.value * 5;
   e.target.blur();
   cancelAnimationFrame(animation);
   animation = requestAnimationFrame(draw);

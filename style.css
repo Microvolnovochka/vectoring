@@ -9,7 +9,7 @@
 }
 
 .select-level {
-  display: none;
+  /*display: none;*/
   position: absolute;
   top: 10px;
   left: 10px;
@@ -25,8 +25,8 @@
   flex-wrap: wrap;
   -webkit-flex-direction: row-reverse;
   flex-direction: row-reverse;
-  width: 200px;
-  height: 300px;
+  width: 15%;
+  height: 45%;
 }
 
 .keyboard-key {
@@ -138,10 +138,17 @@
 .info {
   position: absolute;
   font-size: 25px;
-  bottom: 350px;
+  bottom: 50%;
   left: 20px;
 }
 
 .info p {
   margin: 0;
+}
+
+.levelsinfo {
+  position: absolute;
+  font-size: 100%;
+  top: 2%;
+  right: 20px;
 }
