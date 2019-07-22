@@ -7,6 +7,7 @@ var longscreen = window.innerHeight<=1080?false:true;
 var height = ctx.canvas.height = window.innerHeight>1080?1080:window.innerHeight - 1;
 var userInputInt = null;
 var pause = false;
+var nextLevel = false;
 var povorotn = null;//
 var prevAngle = null;//для подчсета поворотов
 var userInput = "000";
@@ -73,7 +74,7 @@ var cren = {
   },
 };
 var progressBar = {
-  level: 1,
+  level: 3,
   count: 0,
 };
 var levels = {
@@ -141,27 +142,29 @@ function draw(time) {
     if (!pause)
     {
       requestAnimationFrame(draw);
+      ctx.clearRect(0, 0, width, height);
+      if (!longscreen)
+      {
+        drawVisualBox();
+      }
+      drawMiniMap(miniMap);
+      drawPetals(levels[progressBar.level]);
+      outOfMap(airplane);
+      drawPath(pathpoints);
+      drawAp(airports);
+      drawAirplane(airplane);
+      upgradeLevelInfo(airports);
+      progressCheck(progressBar);
+      upgradeInfo();
     }
-    ctx.clearRect(0, 0, width, height);
-    if (!longscreen)
-    {
-      drawVisualBox();
-    }
-    drawMiniMap(miniMap);
-    drawPetals(levels[progressBar.level]);
-    outOfMap(airplane);
-    drawPath(pathpoints);
-    drawAp(airports);
-    drawAirplane(airplane);
-    upgradeLevelInfo(airports);
-    progressCheck(progressBar);
-    upgradeInfo();
     //progressBar.count++;
   }
   else
   {
     ctx.clearRect(0, 0, width, height);
-    drawText("Congratulations");
+    drawText("Вы прошли финальный уровень. Желаете начать сначала? (y/n)");
+    pause = true;
+    nextLevel = true;
   }
 }
 
@@ -278,7 +281,6 @@ function drawAp(airports){
 
 function drawAirplane(airplane)
 {
-  //var v = null;
   ctx.save();
   ctx.lineWidth = 1;
   ctx.strokeStyle = '#ff0000';
@@ -488,26 +490,9 @@ function progressCheck(progress){
   if (progress.count>=1)
   {
     cancelAnimationFrame(animation);
-    var ans = prompt("Want to replay this level? y/n");
-    if (ans==="y")
-    {
-      progress.count = 0;
-      airports.splice(0,airports.length);
-      pathpoints.splice(0,pathpoints.length);
-      airplane.mmx = (width-miniMap.xb)/2+miniMap.xb;
-      airplane.mmy = height - 10 -((height-miniMap.yb)/10);
-      veloc = 100;
-      airplane.angle = 0;
-      animation = requestAnimationFrame(draw);
-    }
-    else 
-    {
-      progress.level++;
-      progress.count = 0; 
-      airports.splice(0,airports.length);
-      pathpoints.splice(0,pathpoints.length);
-      animation = requestAnimationFrame(draw);
-    }
+    pause = true;
+    nextLevel = true;
+    drawText("Вы закончили уровень №"+progress.level.toString()+". Желаете перепройти его? (y/n)");
     return;
   }
   for (var i=0;i<airports.length;i++)
@@ -577,6 +562,7 @@ function upgradeLevelInfo(airports){
   {
     for (var i =0;i<levels[progressBar.level].airpotrN;i++)
     {
+      par.querySelectorAll("div")[i].className = "redcircle";
       if (airports[i].collision)
       {
         str = "пройден. Количество поворотов: "+airports[i].povorotn.toString();
@@ -656,9 +642,12 @@ document.querySelector('.keyboard-container').addEventListener('click', function
         animation = requestAnimationFrame(draw);
       }
     } else {
-      cancelAnimationFrame(animation);
-      drawText('Значение угла должно быть не больше 360°');
-      pause = true;
+      if (!pause)
+      {
+        drawText('Значение угла должно быть не больше 360°');
+        cancelAnimationFrame(animation);
+        pause = true;
+      }
     }
   } else if (typeof e.target.value === 'string' && userInput.toString().length >= 3) {
     userInput = '' + userInput.toString().slice(1) + e.target.value;
@@ -679,6 +668,7 @@ window.matchMedia("(min-height:1080px)").addListener((event)=>{
 })
 
 document.addEventListener('keydown', function(e) {
+  console.log(e.which);
   if (e.which === 13) {
     if (userInput >= 0 && userInput < 361) {
       userInputInt=parseInt(userInput);
@@ -688,9 +678,12 @@ document.addEventListener('keydown', function(e) {
         animation = requestAnimationFrame(draw);
       }
     } else {
-      drawText('Значение угла должно быть не больше 360°');
-      cancelAnimationFrame(animation);
-      pause = true;
+      if (!pause)
+      {
+        drawText('Значение угла должно быть не больше 360°');
+        cancelAnimationFrame(animation);
+        pause = true;
+      }
     }
   } else if (e.which === 8) {
     userInput = '000';
@@ -718,6 +711,48 @@ document.addEventListener('keydown', function(e) {
       veloc = 100;
       //drawText("Скорость не должна быть меньше 100 км/ч")
     }
+  } else if(e.which==89&&pause==true&&nextLevel==true){
+    if (progressBar.level==6)
+    {
+      progressBar.count = 0;
+      progressBar.level = 1;
+      airports.splice(0,airports.length);
+      pathpoints.splice(0,pathpoints.length);
+      airplane.mmx = (width-miniMap.xb)/2+miniMap.xb;
+      airplane.mmy = height - 10 -((height-miniMap.yb)/10);
+      userInputInt = null;
+      veloc = 100;
+      airplane.angle = 0;
+      pause = false;
+      nextLevel = false;
+      animation = requestAnimationFrame(draw);
+    }
+    progressBar.count = 0;
+    airports.splice(0,airports.length);
+    pathpoints.splice(0,pathpoints.length);
+    airplane.mmx = (width-miniMap.xb)/2+miniMap.xb;
+    airplane.mmy = height - 10 -((height-miniMap.yb)/10);
+    userInputInt = null;
+    veloc = 100;
+    airplane.angle = 0;
+    pause = false;
+    nextLevel = false;
+    animation = requestAnimationFrame(draw);
+  } else if (e.which==78&&pause==true&&nextLevel==true){
+    if (progressBar.level==6)
+    {
+      nextLevel = false;
+      ctx.clearRect(0,0,width,height);
+      drawText("42");
+      return;
+    }
+    pause = false;
+    nextLevel = false;
+    progressBar.level++;
+    progressBar.count = 0; 
+    airports.splice(0,airports.length);
+    pathpoints.splice(0,pathpoints.length);
+    animation = requestAnimationFrame(draw);
   }
   display.textContent = userInput;
 });
