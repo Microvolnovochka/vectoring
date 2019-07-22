@@ -74,7 +74,7 @@ var cren = {
   },
 };
 var progressBar = {
-  level: 3,
+  level: 1,
   count: 0,
 };
 var levels = {
@@ -145,9 +145,10 @@ function draw(time) {
       ctx.clearRect(0, 0, width, height);
       if (!longscreen)
       {
-        drawVisualBox();
+        drawSideBox();
       }
       drawMiniMap(miniMap);
+      drawScales(height/10);
       drawPetals(levels[progressBar.level]);
       outOfMap(airplane);
       drawPath(pathpoints);
@@ -168,12 +169,41 @@ function draw(time) {
   }
 }
 
-function drawVisualBox(){
+function drawSideBox(){
   ctx.save();
   ctx.beginPath();
   ctx.fillStyle = "#4f4b4b";
   ctx.fillRect(0,0,300,height-0);
   ctx.fillRect(width-301,0,301,height-0);
+  ctx.restore();
+}
+
+function drawScales(km){
+  var x = 0;
+  ctx.save();
+  ctx.moveTo(width/2,25);
+  ctx.lineTo(width/2-km/2,25);
+  x = width/2-km/2;
+  for (var i=0;i<3;i++)
+  {
+    ctx.moveTo(x,15);
+    ctx.lineTo(x,35);
+    ctx.moveTo(x,25);
+    ctx.lineTo(x-km,25);
+    x-=km;
+  }
+  ctx.moveTo(width/2,25);
+  ctx.lineTo(width/2+km/2,25);
+  x = width/2+km/2;
+  for (i=0;i<3;i++)
+  {
+    ctx.moveTo(x,15);
+    ctx.lineTo(x,35);
+    ctx.moveTo(x,25);
+    ctx.lineTo(x+km,25);
+    x+=km;
+  }
+  ctx.stroke();
   ctx.restore();
 }
 
@@ -190,6 +220,7 @@ function drawMiniMap(miniMap){
   ctx.lineTo(miniMap.xb,miniMap.yb);
   ctx.lineTo(width,miniMap.yb);
   ctx.lineTo(width,height-10);
+  ctx.lineTo(miniMap.xb,height-10);
   ctx.stroke();
   ctx.fill();
   ctx.restore();
@@ -411,9 +442,12 @@ function drawPetals(level) {
       ctx.beginPath();
       ctx.rotate(Math.PI / (level.petals / 2));
       ctx.moveTo(0, 0);
-      if (level.center) {
-        ctx.lineTo(150, 0);
-      } else {
+      if (!longscreen)
+      {
+        ctx.lineTo(400<width-2*300?200:(width-600)/2, 0);
+      }
+      else 
+      {
         ctx.lineTo(200, 0);
       }
       ctx.stroke();
@@ -462,6 +496,7 @@ function outOfMap(airplane){
       airplane.mmy = airplane.mmy;
       airports.splice(0,airports.length);
       pathpoints.splice(0,pathpoints.length);
+      povorotn = 0;
   }
   else if (airplane.mmx>=width)
   {
@@ -469,6 +504,7 @@ function outOfMap(airplane){
       airplane.mmy = airplane.mmy;
       airports.splice(0,airports.length);
       pathpoints.splice(0,pathpoints.length);
+      povorotn = 0;
   }
   else if (airplane.mmy<=miniMap.yb)
   {
@@ -476,6 +512,7 @@ function outOfMap(airplane){
       airplane.mmy = height - 10;
       airports.splice(0,airports.length);
       pathpoints.splice(0,pathpoints.length);
+      povorotn = 0;
   }
   else if (airplane.mmy>=height-10)
   {
@@ -483,6 +520,7 @@ function outOfMap(airplane){
       airplane.mmy = miniMap.yb+1;
       airports.splice(0,airports.length);
       pathpoints.splice(0,pathpoints.length);
+      povorotn = 0;
   }
 }
 

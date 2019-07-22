@@ -85,18 +85,19 @@
 .levelsinfo {
   position: absolute;
   font-size: 120%;
-  width: 20%;
+  width: 270px;
   height: 20%;
   top: 2%;
   right: 20px;
 }
 
-.levelsinfo .level {
+.levelsinfo .level  {
   text-align: center;
 }
 
 .redcircle {
   width: 12px;
+  text-align: right;
   height: 12px;
   border-radius: 7px;
   background: red;
