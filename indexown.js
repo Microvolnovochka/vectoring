@@ -6,11 +6,10 @@ var width = ctx.canvas.width = window.innerWidth;
 var longscreen = window.innerHeight<=1080?false:true;
 var height = ctx.canvas.height = window.innerHeight>1080?1080:window.innerHeight - 1;
 var userInputInt = null;
-var stop = false;
+var pause = false;
 var povorotn = null;//
 var prevAngle = null;//для подчсета поворотов
 var userInput = "000";
-var sucess = false;
 var km = 300/50;//количество пикселей в одном километре
 var coefx = (width-300*2)/(300)*5;
 var coefy = height/(300)*5;
@@ -137,6 +136,12 @@ function init() {
 }
 
 function draw(time) {
+  if (progressBar.level!=6)
+  {
+    if (!pause)
+    {
+      requestAnimationFrame(draw);
+    }
     ctx.clearRect(0, 0, width, height);
     if (!longscreen)
     {
@@ -151,11 +156,13 @@ function draw(time) {
     upgradeLevelInfo(airports);
     progressCheck(progressBar);
     upgradeInfo();
-    progressBar.count++;
-    if (!stop)
-    {
-      requestAnimationFrame(draw);
-    }
+    //progressBar.count++;
+  }
+  else
+  {
+    ctx.clearRect(0, 0, width, height);
+    drawText("Congratulations");
+  }
 }
 
 function drawVisualBox(){
@@ -480,49 +487,26 @@ function outOfMap(airplane){
 function progressCheck(progress){
   if (progress.count>=1)
   {
-    if (progress.level!=5)
-    {
-      cancelAnimationFrame(animation);
-      var ans = prompt("Want to replay this level? y/n");
-      if (ans==="y")
-      {
-        progress.count = 0;
-        airports.splice(0,airports.length);
-        pathpoints.splice(0,pathpoints.length);
-        airplane.mmx = (width-miniMap.xb)/2+miniMap.xb;
-        airplane.mmy = height - 10 -((height-miniMap.yb)/10);
-        veloc = 100;
-        airplane.angle = 0;
-        animation = requestAnimationFrame(draw);
-      }
-      else 
-      {
-        progress.level++;
-        progress.count = 0; 
-        airports.splice(0,airports.length);
-        pathpoints.splice(0,pathpoints.length);
-        animation = requestAnimationFrame(draw);
-      }
-      return;
-    }
     cancelAnimationFrame(animation);
-    var ans = prompt("This is the end of your jorney. Do you want to replay it? (y/n)");
+    var ans = prompt("Want to replay this level? y/n");
     if (ans==="y")
     {
-      progress.level =1;
       progress.count = 0;
+      airports.splice(0,airports.length);
+      pathpoints.splice(0,pathpoints.length);
       airplane.mmx = (width-miniMap.xb)/2+miniMap.xb;
       airplane.mmy = height - 10 -((height-miniMap.yb)/10);
       veloc = 100;
       airplane.angle = 0;
-      airports.splice(0,airports.length);
-      pathpoints.splice(0,pathpoints.length);
       animation = requestAnimationFrame(draw);
     }
     else 
     {
-      cancelAnimationFrame(animation);
-      stop = true;
+      progress.level++;
+      progress.count = 0; 
+      airports.splice(0,airports.length);
+      pathpoints.splice(0,pathpoints.length);
+      animation = requestAnimationFrame(draw);
     }
     return;
   }
@@ -574,7 +558,7 @@ function Airport(){
   this.povorotn = null;
   this.mmx = getRandomInt(miniMap.xb+20,width-20);
   this.mmy = getRandomInt(miniMap.yb+20,height-20);
-  while (this.mmy==airplane.mmy&&this.mmx==irplane.mmx)
+  while (this.mmy==airplane.mmy&&this.mmx==airplane.mmx)
   {
     this.mmx = getRandomInt(miniMap.xb,width);
     this.mmy = getRandomInt(miniMap.yb,height);
@@ -660,24 +644,21 @@ document.querySelector('.info').addEventListener('click',function(e){
   }
 });
 
-document.querySelector('.select-level').addEventListener('change', function (e) {
-  progressBar.level = e.target.value;
-  progressBar.count = 0;
-  airports.splice(0,airports.length);
-  e.target.blur();
-  cancelAnimationFrame(animation);
-  animation = requestAnimationFrame(draw);
-});
-
 document.querySelector('.keyboard-container').addEventListener('click', function (e) {
   if (e.target.value === 'reset') {
     userInput = '000';
   } else if (e.target.value === 'enter') {
-    if (userInput % 5 === 0 && userInput >= 0 && userInput < 361) {
+    if (userInput >= 0 && userInput < 361) {
       userInputInt=parseInt(userInput);
+      if (pause)
+      {
+        pause = false;
+        animation = requestAnimationFrame(draw);
+      }
     } else {
-      //cancelAnimationFrame(animation);
-      drawText('Значение угла должно быть кратно 5 и не больше 360°');
+      cancelAnimationFrame(animation);
+      drawText('Значение угла должно быть не больше 360°');
+      pause = true;
     }
   } else if (typeof e.target.value === 'string' && userInput.toString().length >= 3) {
     userInput = '' + userInput.toString().slice(1) + e.target.value;
@@ -701,10 +682,15 @@ document.addEventListener('keydown', function(e) {
   if (e.which === 13) {
     if (userInput >= 0 && userInput < 361) {
       userInputInt=parseInt(userInput);
-        
+      if (pause)
+      {
+        pause = false;
+        animation = requestAnimationFrame(draw);
+      }
     } else {
+      drawText('Значение угла должно быть не больше 360°');
       cancelAnimationFrame(animation);
-      drawText('Значение угла должно быть кратно 5 и не больше 360°');
+      pause = true;
     }
   } else if (e.which === 8) {
     userInput = '000';
@@ -723,14 +709,14 @@ document.addEventListener('keydown', function(e) {
     if (veloc>1500)
     {
       veloc = 1500;
-      drawText("Скорость не должна превышать 1500 км/ч")
+      //drawText("Скорость не должна превышать 1500 км/ч")
     }
   } else if (e.which==109||e.which==173) {
     veloc-=50;
     if (veloc<100)
     {
       veloc = 100;
-      drawText("Скорость не должна быть меньше 100 км/ч")
+      //drawText("Скорость не должна быть меньше 100 км/ч")
     }
   }
   display.textContent = userInput;
