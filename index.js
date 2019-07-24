@@ -328,6 +328,7 @@ document.querySelector('.keyboard-container').addEventListener('click', function
     } else {
       cancelAnimationFrame(animation);
       drawText('Значение угла должно быть кратно 5 и не больше 360°');
+      return;
     }
   } else if (typeof e.target.value === 'string' && userInput.toString().length >= 3) {
     userInput = '' + userInput.toString().slice(1) + e.target.value;
@@ -342,7 +343,7 @@ document.addEventListener('keydown', function(e) {
     } else {
       cancelAnimationFrame(animation);
       drawText('Значение угла должно быть кратно 5 и не больше 360°');
-      requestAnimationFrame(draw);
+      return;
     }
   } else if (e.which === 8) {
     userInput = '000';

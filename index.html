@@ -11,13 +11,21 @@
   <div class="info">
     <p class="cren">Крен: <span>0</span></p>
     <p class="course">Курс: <span>0</span></p>
-    <p class="speed">Скорость:<span>0</span><span id="plusspeed"> +</span><span id="minusspeed"> -</span></p>
+    <p class="speed">Скорость:<span>0</span></p>
+    <p style="text-align: center;">
+      <span id="minusspeed">-</span>
+      <span class="info__pause"> || </span>
+      <span class="info__play"> ► </span>
+      <span id="plusspeed"> +</span>
+    </p>
   </div>
   <div class="levelsinfo">
     <p class="level">Уровень №<span></span></p>
     <p class="airport">Аэропорт №<span></span><div></div></p>
     <p class="airport">Аэропорт №<span></span><div></div></p>
   </div>
+  <button class="yesbt">Перепройти его</button>
+  <button class="nobt">Перейти на следующий уровень</button>
   <canvas id="field" class="canvclass"></canvas>
   <select class="select-level">
     <option value="1" selected="selected">1</option>

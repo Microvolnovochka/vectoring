@@ -1,6 +1,9 @@
+
 var display = document.querySelector('.keyboard-display');
 var canvas = document.getElementById('field');
 var body = document.getElementById('body');
+var yes = document.querySelector(".yesbt");
+var no = document.querySelector(".nobt");
 var ctx = canvas.getContext('2d');
 var width = ctx.canvas.width = window.innerWidth;
 var longscreen = window.innerHeight<=1080?false:true;
@@ -148,7 +151,7 @@ function draw(time) {
         drawSideBox();
       }
       drawMiniMap(miniMap);
-      drawScales(height/10);
+      drawScale(height/10,width/2,height-30);
       drawPetals(levels[progressBar.level]);
       outOfMap(airplane);
       drawPath(pathpoints);
@@ -158,14 +161,23 @@ function draw(time) {
       progressCheck(progressBar);
       upgradeInfo();
     }
+    else
+    {
+      pauseEffect();
+    }
     //progressBar.count++;
   }
   else
   {
     ctx.clearRect(0, 0, width, height);
+    pauseEffect();
     drawText("Вы прошли финальный уровень. Желаете начать сначала? (y/n)");
     pause = true;
     nextLevel = true;
+    yes.style.display = "block";
+    yes.innerHTML = "Начать с первого уровня";
+    no.style.display = "block";
+    no.innerHTML = "Закончить упражнение";
   }
 }
 
@@ -178,32 +190,47 @@ function drawSideBox(){
   ctx.restore();
 }
 
-function drawScales(km){
-  var x = 0;
+function drawScale(km,xb,yb,vertical){
+  var x = xb;
+  var y = yb;
+  var texttype = ctx.font;
+  ctx.font = "20px sans-serif";
   ctx.save();
-  ctx.moveTo(width/2,25);
-  ctx.lineTo(width/2-km/2,25);
-  x = width/2-km/2;
-  for (var i=0;i<3;i++)
+  ctx.translate(x,y);
+  if (vertical)
   {
-    ctx.moveTo(x,15);
-    ctx.lineTo(x,35);
-    ctx.moveTo(x,25);
-    ctx.lineTo(x-km,25);
-    x-=km;
+    ctx.rotate(Math.PI/2);
   }
-  ctx.moveTo(width/2,25);
-  ctx.lineTo(width/2+km/2,25);
-  x = width/2+km/2;
-  for (i=0;i<3;i++)
+  ctx.moveTo(0,0);
+  ctx.lineTo(0-km/2,0);
+  x = 0-km/2;
+  for (var i=0;i<2;i++)
   {
-    ctx.moveTo(x,15);
-    ctx.lineTo(x,35);
-    ctx.moveTo(x,25);
-    ctx.lineTo(x+km,25);
+    ctx.lineTo(x,-15);
+    ctx.moveTo(x,0);
+    x-=km;
+    ctx.lineTo(x,0);
+  }
+  ctx.fillText("km",x+15,-5);
+  ctx.moveTo(0,0);
+  ctx.lineTo(0+km/2,0);
+  x = 0+km/2;
+  for (var i=0;i<2;i++)
+  {
+    ctx.lineTo(x,-15);
+    ctx.moveTo(x,0);
     x+=km;
+    ctx.lineTo(x,0);
   }
   ctx.stroke();
+  ctx.restore();
+  ctx.font = texttype;
+}
+
+function pauseEffect(){
+  ctx.save();
+  ctx.fillStyle = "rgba(54, 48, 48, 0.5)";
+  ctx.fillRect(0,0,width,height);
   ctx.restore();
 }
 
@@ -456,6 +483,10 @@ function drawPetals(level) {
 ctx.restore();
 }
 
+function drawText(text) {
+  ctx.fillText(text, width / 2, 70);
+}
+
 function collision(airport){
   if (!airport.collision)
   {
@@ -530,7 +561,11 @@ function progressCheck(progress){
     cancelAnimationFrame(animation);
     pause = true;
     nextLevel = true;
-    drawText("Вы закончили уровень №"+progress.level.toString()+". Желаете перепройти его? (y/n)");
+    yes.style.display = "block";
+    yes.innerHTML = "Перепройти его";
+    no.style.display = "block";
+    no.innerHTML = "Перейти на следующий";
+    drawText("Вы закончили уровень №"+progress.level.toString());
     return;
   }
   for (var i=0;i<airports.length;i++)
@@ -545,17 +580,6 @@ function progressCheck(progress){
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
-}
-
-function getRandomAngle(min, max, cur) {
-    var rAngl = Math.floor(Math.random() * (max - min)) + min;
-    rAngl = rAngl - (rAngl % 5);
-  
-    if (cur !== rAngl && cur + 5 !== rAngl && cur - 5 !== rAngl) {
-      return rAngl;
-    }
-  
-    return getRandomAngle(min, max, cur);
 }
 
 function getCoordsByAngleRadius(center, angle, distance) {
@@ -642,58 +666,115 @@ function isNumPad(e) {
   return false;
 }
 
-function drawText(text) {
-  ctx.fillText(text, width / 2, 70);
+function throttle(func, ms) {
+  var isThrottled = false,
+    savedArgs,
+    savedThis;
+  function wrapper() {
+    if (isThrottled) { // (2)
+      savedArgs = arguments;
+      savedThis = this;
+      return;
+    }
+    func.apply(this, arguments); // (1)
+    isThrottled = true;
+    setTimeout(function() {
+      isThrottled = false; // (3)
+      if (savedArgs) {
+        wrapper.apply(savedThis, savedArgs);
+        savedArgs = savedThis = null;
+      }
+    }, ms);
+  }
+  return wrapper;
 }
 
+document.querySelector(".select-level").addEventListener("change",function(e){
+  cancelAnimationFrame(animation);
+  progressBar.level = Number(e.target.value);
+  progressBar.count = 0;
+  airports.splice(0,airports.length);
+  pathpoints.splice(0,pathpoints.length);
+  airplane.mmx = (width-miniMap.xb)/2+miniMap.xb;
+  airplane.mmy = height - 10 -((height-miniMap.yb)/10);
+  povorotn = 0;
+  userInputInt = null;
+  veloc = 100;
+  airplane.angle = 0;
+  pause = false;
+  nextLevel = false;
+  animation = requestAnimationFrame(draw);
+});
+
 document.querySelector('.info').addEventListener('click',function(e){
-  if (e.target.id=="plusspeed")
+  var target =e.target;
+  if (target.className=="info__pause"&&!pause)
   {
-    veloc+=50;
-    if (veloc>1500)
-    {
-      veloc = 1500;
-      drawText("Скорость не должна превышать 1500 км/ч")
-    }
+    cancelAnimationFrame(animation);
+    pause = true;
+    target.style.display = "none";
+    document.querySelector(".info__play").style.display = "inline";
   }
-  else if (e.target.id=="minusspeed")
+  else if (document.querySelector(".info__pause").style.display=="none"&&target.className=="info__play")
   {
-    veloc-=50;
-    if (veloc<100)
+    pause = false;
+    target.style.display = "none";
+    document.querySelector(".info__pause").style.display = "inline";
+    animation = requestAnimationFrame(draw);
+  }
+  if (!pause)
+  {
+    if (e.target.id=="plusspeed")
     {
-      veloc = 100;
-      cancelAnimationFrame(animation);
-      drawText("Скорость не должна быть меньше 100 км/ч")
+      veloc+=50;
+      if (veloc>1500)
+      {
+        veloc = 1500;
+        drawText("Скорость не должна превышать 1500 км/ч")
+      }
+    }
+    else if (e.target.id=="minusspeed")
+    {
+      veloc-=50;
+      if (veloc<100)
+      {
+        veloc = 100;
+        cancelAnimationFrame(animation);
+        drawText("Скорость не должна быть меньше 100 км/ч")
+      }
     }
   }
 });
 
 document.querySelector('.keyboard-container').addEventListener('click', function (e) {
-  if (e.target.value === 'reset') {
-    userInput = '000';
-  } else if (e.target.value === 'enter') {
-    if (userInput >= 0 && userInput < 361) {
-      userInputInt=parseInt(userInput);
-      if (pause)
-      {
-        pause = false;
-        animation = requestAnimationFrame(draw);
+  if (document.querySelector(".info__pause").style.display!="none")
+  {
+    if (e.target.value === 'reset') {
+      userInput = '000';
+    } else if (e.target.value === 'enter') {
+      if (userInput >= 0 && userInput < 361) {
+        userInputInt=parseInt(userInput);
+        if (pause)
+        {
+          pause = false;
+          animation = requestAnimationFrame(draw);
+        }
+      } else {
+        if (!pause)
+        {
+          drawText('Значение угла должно быть не больше 360°');
+          cancelAnimationFrame(animation);
+          pause = true;
+        }
       }
-    } else {
-      if (!pause)
-      {
-        drawText('Значение угла должно быть не больше 360°');
-        cancelAnimationFrame(animation);
-        pause = true;
-      }
+    } else if (typeof e.target.value === 'string' && userInput.toString().length >= 3) {
+      userInput = '' + userInput.toString().slice(1) + e.target.value;
     }
-  } else if (typeof e.target.value === 'string' && userInput.toString().length >= 3) {
-    userInput = '' + userInput.toString().slice(1) + e.target.value;
+    display.textContent = userInput;
   }
-  display.textContent = userInput;
 });
 
-window.matchMedia("(min-height:1080px)").addListener((event)=>{
+/*window.matchMedia("(min-height:1080px)").addListener((event)=>{
   if (event.matches){
     longscreen = true;
     height = ctx.canvas.height = 1080;
@@ -703,53 +784,26 @@ window.matchMedia("(min-height:1080px)").addListener((event)=>{
     longscreen = false;
     height = ctx.canvas.height = window.innerHeight;
   }
-})
+})*/
 
-document.addEventListener('keydown', function(e) {
-  console.log(e.which);
-  if (e.which === 13) {
-    if (userInput >= 0 && userInput < 361) {
-      userInputInt=parseInt(userInput);
-      if (pause)
-      {
-        pause = false;
-        animation = requestAnimationFrame(draw);
-      }
-    } else {
-      if (!pause)
-      {
-        drawText('Значение угла должно быть не больше 360°');
-        cancelAnimationFrame(animation);
-        pause = true;
-      }
-    }
-  } else if (e.which === 8) {
-    userInput = '000';
-  } else if (e.which === 81) {
-    advance >= 4 ? advance=0 : advance+=1;
-    var sel = document.querySelector('.select-level');
-    if (advance === 4) {
-      sel.style.display = 'block';
-    } else {
-      sel.style.display = 'none';
-    }
-  } else if (isNumPad(e)) {
-    userInput = '' + userInput.toString().slice(1) + (e.key ? e.key : e.keyIdentifier.slice(-1));
-  } else if (e.which==107||e.which==61) {
-    veloc+=50;
-    if (veloc>1500)
-    {
-      veloc = 1500;
-      //drawText("Скорость не должна превышать 1500 км/ч")
-    }
-  } else if (e.which==109||e.which==173) {
-    veloc-=50;
-    if (veloc<100)
-    {
-      veloc = 100;
-      //drawText("Скорость не должна быть меньше 100 км/ч")
-    }
-  } else if(e.which==89&&pause==true&&nextLevel==true){
+window.addEventListener('resize',throttle(function(e){
+  if (document.documentElement.clientHeight>1080)
+  {
+    longscreen = true;
+    height = ctx.canvas.height = 1080;
+  }
+  else
+  {
+    longscreen = false;
+    height = ctx.canvas.height = window.innerHeight;
+  }
+},500));
+
+yes.addEventListener("click", function(e){
+  if (pause==true&&nextLevel==true)
+  {
+    yes.style.display = "none";
+    no.style.display = "none";
     if (progressBar.level==6)
     {
       progressBar.count = 0;
@@ -764,6 +818,7 @@ document.addEventListener('keydown', function(e) {
       pause = false;
       nextLevel = false;
       animation = requestAnimationFrame(draw);
+      return;
     }
     progressBar.count = 0;
     airports.splice(0,airports.length);
@@ -776,7 +831,14 @@ document.addEventListener('keydown', function(e) {
     pause = false;
     nextLevel = false;
     animation = requestAnimationFrame(draw);
-  } else if (e.which==78&&pause==true&&nextLevel==true){
+  }
+});
+
+no.addEventListener("click",function(e){
+  if (pause==true&&nextLevel==true)
+  {
+    yes.style.display = "none";
+    no.style.display = "none";
     if (progressBar.level==6)
     {
       nextLevel = false;
@@ -792,5 +854,96 @@ document.addEventListener('keydown', function(e) {
     pathpoints.splice(0,pathpoints.length);
     animation = requestAnimationFrame(draw);
   }
-  display.textContent = userInput;
+});
+
+document.addEventListener('keydown', function(e) {
+  if (document.querySelector(".info__pause").style.display!="none")
+  {
+    if (e.which === 13) {
+      if (userInput >= 0 && userInput < 361) {
+        userInputInt=parseInt(userInput);
+        if (pause)
+        {
+          pause = false;
+          animation = requestAnimationFrame(draw);
+        }
+      } else {
+        if (!pause)
+        {
+          drawText('Значение угла должно быть не больше 360°');
+          cancelAnimationFrame(animation);
+          pause = true;
+        }
+      }
+    } else if (e.which === 8) {
+      userInput = '000';
+    } else if (e.which === 81) {
+      advance >= 4 ? advance=0 : advance+=1;
+      var sel = document.querySelector('.select-level');
+      if (advance === 4) {
+        sel.style.display = 'block';
+      } else {
+        sel.style.display = 'none';
+      }
+    } else if (isNumPad(e)) {
+      userInput = '' + userInput.toString().slice(1) + (e.key ? e.key : e.keyIdentifier.slice(-1));
+    } else if ((e.which==107||e.which==61)&&!pause) {
+      veloc+=50;
+      if (veloc>1500)
+      {
+        veloc = 1500;
+        //drawText("Скорость не должна превышать 1500 км/ч")
+      }
+    } else if ((e.which==109||e.which==173)&&!pause) {
+      veloc-=50;
+      if (veloc<100)
+      {
+        veloc = 100;
+        //drawText("Скорость не должна быть меньше 100 км/ч")
+      }
+    } else if(e.which==89&&pause==true&&nextLevel==true){
+      if (progressBar.level==6)
+      {
+        progressBar.count = 0;
+        progressBar.level = 1;
+        airports.splice(0,airports.length);
+        pathpoints.splice(0,pathpoints.length);
+        airplane.mmx = (width-miniMap.xb)/2+miniMap.xb;
+        airplane.mmy = height - 10 -((height-miniMap.yb)/10);
+        userInputInt = null;
+        veloc = 100;
+        airplane.angle = 0;
+        pause = false;
+        nextLevel = false;
+        animation = requestAnimationFrame(draw);
+      }
+      progressBar.count = 0;
+      airports.splice(0,airports.length);
+      pathpoints.splice(0,pathpoints.length);
+      airplane.mmx = (width-miniMap.xb)/2+miniMap.xb;
+      airplane.mmy = height - 10 -((height-miniMap.yb)/10);
+      userInputInt = null;
+      veloc = 100;
+      airplane.angle = 0;
+      pause = false;
+      nextLevel = false;
+      animation = requestAnimationFrame(draw);
+    } else if (e.which==78&&pause==true&&nextLevel==true){
+      if (progressBar.level==6)
+      {
+        nextLevel = false;
+        ctx.clearRect(0,0,width,height);
+        drawText("42");
+        return;
+      }
+      pause = false;
+      nextLevel = false;
+      progressBar.level++;
+      progressBar.count = 0; 
+      airports.splice(0,airports.length);
+      pathpoints.splice(0,pathpoints.length);
+      animation = requestAnimationFrame(draw);
+    }
+    display.textContent = userInput;
+  }
 });
