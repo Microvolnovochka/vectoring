@@ -8,12 +8,12 @@ var ctx = canvas.getContext('2d');
 var width = ctx.canvas.width = window.innerWidth;
 var longscreen = window.innerHeight<=1080?false:true;
 var height = ctx.canvas.height = window.innerHeight>1080?1080:window.innerHeight - 1;
-var userInputInt = null;
 var pause = false;
 var nextLevel = false;
 var povorotn = null;//
 var prevAngle = null;//для подчсета поворотов
 var userInput = "000";
+var userInputInt = 0;
 var km = 300/50;//количество пикселей в одном километре
 var coefx = (width-300*2)/(300)*5;
 var coefy = height/(300)*5;
@@ -48,7 +48,7 @@ var miniMap ={
   xviszs: null,
   yviszf: null,
   yviszs: null,
-  color: "rgba(48, 45, 45, 1)",
+  color: "#9C9C9C",
 };
 var cren = {
   15:{
@@ -153,10 +153,6 @@ function draw(time) {
     {
       requestAnimationFrame(draw);
       ctx.clearRect(0, 0, width, height);
-      if (!longscreen)
-      {
-        drawSideBox();
-      }
       drawMiniMap(miniMap);
       if (!cursor.is)
       {
@@ -189,15 +185,6 @@ function draw(time) {
     no.style.display = "block";
     no.innerHTML = "Закончить упражнение";
   }
-}
-
-function drawSideBox(){
-  ctx.save();
-  ctx.beginPath();
-  ctx.fillStyle = "#4f4b4b";
-  ctx.fillRect(0,0,300,height-0);
-  ctx.fillRect(width-301,0,301,height-0);
-  ctx.restore();
 }
 
 function drawScale(km,xb,yb,vertical){
@@ -726,18 +713,10 @@ function upgradeLevelInfo(airports){
   {
     for (var i =0;i<levels[progressBar.level].airpotrN;i++)
     {
-      par.querySelectorAll("div")[i].className = "redcircle";
       if (airports[i].collision)
       {
-        str = "пройден. Количество поворотов: "+airports[i].povorotn.toString();
-        if (airports[i].povorotn<3)
-        {
-          par.querySelectorAll("div")[i].className = "greencircle";
-        }
-        else
-        {
-          par.querySelectorAll("div")[i].className = "yellowcircle";
-        }
+        str = "пройден";
+        par.querySelectorAll(".povorots")[i].innerHTML = "Поворотов: "+airports[i].povorotn.toString()
       }
       par.querySelectorAll(".airport > span")[i].innerHTML = (i+1).toString()+" - "+str;
       str = "не пройден";
@@ -749,7 +728,6 @@ function upgradeLevelInfo(airports){
     for (var i =0;i<levels[progressBar.level].airpotrN;i++)
     {
       par.querySelectorAll(".airport > span")[i].innerHTML = (i+1).toString()+" - "+str;
-      par.querySelectorAll("div")[i].className = "redcircle";
     }
     
   }
@@ -808,7 +786,7 @@ document.querySelector(".select-level").addEventListener("change",function(e){
   animation = requestAnimationFrame(draw);
 });
 
-document.querySelector('.info').addEventListener('click',function(e){
+document.querySelector('.infobuttons').addEventListener('click',function(e){
   var target =e.target;
   if (target.className=="info__pause"&&!pause)
   {
@@ -824,27 +802,27 @@ document.querySelector('.info').addEventListener('click',function(e){
     document.querySelector(".info__pause").style.display = "inline";
     animation = requestAnimationFrame(draw);
   }
+});
+
+document.querySelector(".info__plus").addEventListener("click",function(e){
   if (!pause)
   {
-    if (e.target.id=="plusspeed")
-    {
       veloc+=50;
       if (veloc>1500)
       {
         veloc = 1500;
-        drawText("Скорость не должна превышать 1500 км/ч")
       }
-    }
-    else if (e.target.id=="minusspeed")
-    {
+  }
+});
+
+document.querySelector(".info__minus").addEventListener("click",function(e){
+  if (!pause)
+  {
       veloc-=50;
       if (veloc<100)
       {
         veloc = 100;
-        cancelAnimationFrame(animation);
-        drawText("Скорость не должна быть меньше 100 км/ч")
       }
-    }
   }
 });
 
@@ -1015,14 +993,12 @@ document.addEventListener('keydown', function(e) {
       if (veloc>1500)
       {
         veloc = 1500;
-        //drawText("Скорость не должна превышать 1500 км/ч")
       }
     } else if ((e.which==109||e.which==173)&&!pause) {
       veloc-=50;
       if (veloc<100)
       {
         veloc = 100;
-        //drawText("Скорость не должна быть меньше 100 км/ч")
       }
     } else if(e.which==89&&pause==true&&nextLevel==true){
       if (progressBar.level==6)

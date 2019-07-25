@@ -31,7 +31,7 @@
 }
 
 .select-level {
-  /*display: none;*/
+  display: none;
   position: absolute;
   top: 10px;
   left: 10px;
@@ -47,7 +47,7 @@
   flex-wrap: wrap;
   -webkit-flex-direction: row-reverse;
   flex-direction: row-reverse;
-  width: 15%;
+  width: 200px;
   height: 45%;
 }
 
@@ -89,57 +89,92 @@
 
 .info {
   position: absolute;
-  width: 10%;
-  font-size: 25px;
-  bottom: 50%;
-  left: 20px;
+  width: 200px;
+  font-size: 100%;
+  top: 110px;
+  left: 1%;
+}
+
+.info__parametrs{
+  background-color: #9C9C9C; 
+}
+
+.infobuttons{
+  position: absolute;
+  width: 200px;
+  top:200px;
+  left: 1%;
+}
+
+.info__minus{
+  margin: 5%;
+  height: 20px;
+  width: 20px;
+  background-color:  #9C9C9C; 
+}
+
+.info__plus{
+  margin: 5%;
+  height: 100px;
+  width: 100px;
+  background-color:  #9C9C9C; 
 }
 
 .info__play{
+  margin: 5%;
+  height: 20px;
+  width: 20px;
   display: none;
+  background-color:  #9C9C9C; 
 }
 
 .info__pause{
+  margin: 5%;
+  height: 20px;
+  width: 20px;
   display: inline;
+  background-color:  #9C9C9C; 
 }
 
 .info p {
-  margin: 0;
+  margin-top: 2%;
+  margin-left: 0%;
+  margin-bottom: 2%;
+}
+
+.info__parametrs p{
+  margin-left: 2%;
 }
 
 .levelsinfo {
   position: absolute;
-  font-size: 120%;
-  width: 15%;
-  height: 20%;
-  top: 2%;
-  right: 1%;
+  font-size: 100%;
+  width: 200px;
+  height: 100px;
+  left: 1%;
+  text-align: left;
 }
 
-.levelsinfo .level  {
-  text-align: center;
+.levelsinfo p{
+  margin-bottom: 2%;
+  margin-left: 0%;
+  margin-top: 2%;
 }
 
-.redcircle {
-  width: 12px;
-  text-align: right;
-  height: 12px;
-  border-radius: 7px;
-  background: red;
+.levelsinfo__airports{
+  background-color: #9C9C9C; 
 }
 
-.greencircle {
-  width: 12px;
-  height: 12px;
-  border-radius: 7px;
-  background: green;
+.levelsinfo__airports p{
+  margin-top: 2%;
+  margin-right: 2%;
+  margin-left: 2%;
 }
 
-.yellowcircle {
-  width: 12px;
-  height: 12px;
-  border-radius: 7px;
-  background: rgb(255, 255, 0)
+.keyboard__name{
+  position: absolute;
+  bottom: 102%;
+  left:0%
 }
 
 @media (min-height:1081px)
@@ -212,29 +247,8 @@
     top: 1090px;
     right: 20px;
   }
-  
+
   .levelsinfo .level {
     text-align: center;
-  }
-  
-  .redcircle {
-    width: 12px;
-    height: 12px;
-    border-radius: 7px;
-    background: red;
-  }
-  
-  .greencircle {
-    width: 12px;
-    height: 12px;
-    border-radius: 7px;
-    background: green;
-  }
-  
-  .yellowcircle {
-    width: 12px;
-    height: 12px;
-    border-radius: 7px;
-    background: yellow;
   }
 }
