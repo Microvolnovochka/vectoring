@@ -9,9 +9,10 @@ var width = ctx.canvas.width = window.innerWidth;
 var longscreen = window.innerHeight<=1080?false:true;
 var height = ctx.canvas.height = window.innerHeight>1080?1080:window.innerHeight - 1;
 var pause = false;
+var coeffAccel = 1;//коэффициент ускорения воспроизведенеия
 var nextLevel = false;
 var povorotn = null;//
-var prevAngle = null;//для подчсета поворотов
+var prevAngle = 0;//для подчсета поворотов
 var userInput = "000";
 var userInputInt = 0;
 var km = 300/50;//количество пикселей в одном километре
@@ -327,6 +328,10 @@ function drawAp(airports){
         ctx.restore();
       }
       ctx.fill();
+      if (airports[i].mmx<=miniMap.xviszs&&airports[i].mmx>=miniMap.xviszf&&airports[i].mmy>=miniMap.yviszf&&airports[i].mmy<=miniMap.yviszs)
+      {
+        collision(airports[i]);
+      }
       if (!cursor.is)
       {
         if (airports[i].mmx<=miniMap.xviszs&&airports[i].mmx>=miniMap.xviszf&&airports[i].mmy>=miniMap.yviszf&&airports[i].mmy<=miniMap.yviszs)
@@ -335,16 +340,8 @@ function drawAp(airports){
           ctx.save();
           ctx.beginPath();
           ctx.translate(airplane.x,airplane.y);
-          if (longscreen)
-          {
-            airports[i].x = (airports[i].mmx-airplane.mmx)*((width)/(width-miniMap.xb))*5;
-            airports[i].y = (airports[i].mmy-airplane.mmy)*(height/(height-miniMap.yb))*5;
-          }
-          else 
-          {
-            airports[i].x = (airports[i].mmx-airplane.mmx)*((width-2*(width-miniMap.xb))/(width-miniMap.xb))*5;
-            airports[i].y = (airports[i].mmy-airplane.mmy)*(height/(height-miniMap.yb))*5;
-          }
+          airports[i].x = (airports[i].mmx-airplane.mmx)*((width)/(width-miniMap.xb))*5;
+          airports[i].y = (airports[i].mmy-airplane.mmy)*(height/(height-miniMap.yb))*5;
           ctx.arc(airports[i].x,airports[i].y,15,0,2*Math.PI,true);
           if (airports[i].angle!==null)
           {
@@ -362,7 +359,7 @@ function drawAp(airports){
             ctx.stroke();
             ctx.restore();
           }
-          collision(airports[i]);
+          //collision(airports[i]);
           ctx.fill();
           ctx.restore();
         }
@@ -380,16 +377,8 @@ function drawAp(airports){
           ctx.save();
           ctx.beginPath();
           ctx.translate(airplane.x,airplane.y);
-          if (longscreen)
-          {
-            airports[i].x = (airports[i].mmx-cursor.x)*((width)/(width-miniMap.xb))*5;
-            airports[i].y = (airports[i].mmy-cursor.y)*(height/(height-miniMap.yb))*5;
-          }
-          else 
-          {
-            airports[i].x = (airports[i].mmx-cursor.x)*((width-2*(width-miniMap.xb))/(width-miniMap.xb))*5;
-            airports[i].y = (airports[i].mmy-cursor.y)*(height/(height-miniMap.yb))*5;
-          }
+          airports[i].x = (airports[i].mmx-cursor.x)*((width)/(width-miniMap.xb))*5;
+          airports[i].y = (airports[i].mmy-cursor.y)*(height/(height-miniMap.yb))*5;
           ctx.arc(airports[i].x,airports[i].y,15,0,2*Math.PI,true);
           if (airports[i].angle!==null)
           {
@@ -435,7 +424,7 @@ function drawAirplane(airplane)
   prevAngle = userInputInt;
   if (veloc!==null)
   {
-    airplane.v = (veloc*km)/3600/60;
+    airplane.v = (veloc*km)/3600/(60/coeffAccel);
   }
   if(airplane.angle>=360)
   {
@@ -449,11 +438,11 @@ function drawAirplane(airplane)
   {
     if (((airplane.angle+180)>=userInputInt&&userInputInt>airplane.angle)||((airplane.angle-180)>=userInputInt&&userInputInt>(airplane.angle-360)))
     {
-      airplane.angle+=cren["15"][veloc.toString()]/60;
+      airplane.angle+=cren["15"][veloc.toString()]/(60/coeffAccel);
     }
     else
     {
-      airplane.angle-=cren["15"][veloc.toString()]/60;
+      airplane.angle-=cren["15"][veloc.toString()]/(60/coeffAccel);
     }
   }
   else
@@ -494,14 +483,28 @@ function drawAirplane(airplane)
   ctx.lineTo(miniMap.xviszf,miniMap.yviszs);
   ctx.lineTo(miniMap.xviszf,miniMap.yviszf);
   ctx.stroke();
-  ctx.beginPath();  
+  ctx.beginPath();
   ctx.arc(airplane.mmx,airplane.mmy,3,0,Math.PI*2,true);
   ctx.fill();
+  ctx.beginPath();
   if (!cursor.is)
   {
     ctx.translate(airplane.x,airplane.y);
     ctx.rotate(airplane.angle*Math.PI/180);
     ctx.drawImage(plane,-20,-20,40,40);
+  }
+  else if (airplane.mmx<=(cursor.x+30)&&airplane.mmx>=(cursor.x-30)&&airplane.mmy>=(cursor.y-30)&&airplane.mmy<=(cursor.y+30))
+  {
+    var airplanex,airplaney;
+    ctx.save();
+    ctx.beginPath();
+    ctx.translate(airplane.x,airplane.y);
+    airplanex = (airplane.mmx-cursor.x)*((width)/(width-miniMap.xb))*5;
+    airplaney = (airplane.mmy-cursor.y)*(height/(height-miniMap.yb))*5;
+    ctx.translate(airplanex,airplaney);
+    ctx.rotate(airplane.angle*Math.PI/180);
+    ctx.drawImage(plane,-20,-20,40,40);
+    ctx.restore();
   }
   ctx.restore();
 }
@@ -513,7 +516,7 @@ function drawPath(pathpoints){
   {
     pathpoints.push(new Point(airplane.mmx,airplane.mmy));
   }
-  if (count==180)
+  if (count==(180/coeffAccel))
   {
     pathpoints.push(new Point(airplane.mmx,airplane.mmy));
     count = 0;
@@ -532,8 +535,8 @@ function drawPath(pathpoints){
           ctx.save();
           ctx.beginPath();
           ctx.translate(airplane.x,airplane.y);
-          pathpoints[i].x = (pathpoints[i].mmx-airplane.mmx)*((width-2*(width-miniMap.xb))/(width-miniMap.xb))*5;
-          pathpoints[i].y = (pathpoints[i].mmy-airplane.mmy)*(height/(height-miniMap.yb+10))*5;
+          pathpoints[i].x = (pathpoints[i].mmx-airplane.mmx)*((width)/(width-miniMap.xb))*5;
+          pathpoints[i].y = (pathpoints[i].mmy-airplane.mmy)*(height/(height-miniMap.yb))*5;
           ctx.arc(pathpoints[i].x,pathpoints[i].y,5,0,2*Math.PI,true);
           ctx.fill();
           ctx.restore();
@@ -543,6 +546,17 @@ function drawPath(pathpoints){
           pathpoints[i].x = null;
           pathpoints[i].y = null;
         } 
+      }
+      else if (pathpoints[i].mmx<=(cursor.x+30)&&pathpoints[i].mmx>=(cursor.x-30)&&pathpoints[i].mmy>=(cursor.y-30)&&pathpoints[i].mmy<=(cursor.y+30))
+      {
+        ctx.save();
+        ctx.beginPath();
+        ctx.translate(airplane.x,airplane.y);
+        pathpoints[i].x = (pathpoints[i].mmx-cursor.x)*((width)/(width-miniMap.xb))*5;
+        pathpoints[i].y = (pathpoints[i].mmy-cursor.y)*(height/(height-miniMap.yb))*5;
+        ctx.arc(pathpoints[i].x,pathpoints[i].y,5,0,2*Math.PI,true);
+        ctx.fill();
+        ctx.restore();
       }
     }
   }
@@ -579,7 +593,7 @@ function drawText(text) {
 function collision(airport){
   if (!airport.collision)
   {
-    if (Math.abs(airport.x-0)<=10&&Math.abs(airport.y-0)<=10)
+    if (Math.abs(airport.mmx-airplane.mmx)<=1&&Math.abs(airport.mmy-airplane.mmy)<=1)
         {
           if(airport.angle!==null)
           {
@@ -616,6 +630,7 @@ function outOfMap(airplane){
       airplane.mmy = airplane.mmy;
       airports.splice(0,airports.length);
       pathpoints.splice(0,pathpoints.length);
+      prevAngle = userInputInt;
       povorotn = 0;
   }
   else if (airplane.mmx>=width)
@@ -624,6 +639,7 @@ function outOfMap(airplane){
       airplane.mmy = airplane.mmy;
       airports.splice(0,airports.length);
       pathpoints.splice(0,pathpoints.length);
+      prevAngle = userInputInt;
       povorotn = 0;
   }
   else if (airplane.mmy<=miniMap.yb)
@@ -632,6 +648,7 @@ function outOfMap(airplane){
       airplane.mmy = height - 10;
       airports.splice(0,airports.length);
       pathpoints.splice(0,pathpoints.length);
+      prevAngle = userInputInt;
       povorotn = 0;
   }
   else if (airplane.mmy>=height-10)
@@ -640,6 +657,7 @@ function outOfMap(airplane){
       airplane.mmy = miniMap.yb+1;
       airports.splice(0,airports.length);
       pathpoints.splice(0,pathpoints.length);
+      prevAngle = userInputInt;
       povorotn = 0;
   }
 }
@@ -818,11 +836,22 @@ document.querySelector(".info__plus").addEventListener("click",function(e){
 document.querySelector(".info__minus").addEventListener("click",function(e){
   if (!pause)
   {
-      veloc-=50;
-      if (veloc<100)
-      {
-        veloc = 100;
-      }
+    veloc-=50;
+    if (veloc<100)
+    {
+      veloc = 100;
+    }
+  }
+});
+
+document.querySelector(".info__ff").addEventListener("click",function(e){
+  if (!pause)
+  {
+    coeffAccel++;
+    if (coeffAccel>3.5)
+    {
+      coeffAccel=1;
+    }
   }
 });
 
@@ -886,30 +915,12 @@ yes.addEventListener("click", function(e){
     no.style.display = "none";
     if (progressBar.level==6)
     {
-      progressBar.count = 0;
       progressBar.level = 1;
-      airports.splice(0,airports.length);
-      pathpoints.splice(0,pathpoints.length);
-      airplane.mmx = (width-miniMap.xb)/2+miniMap.xb;
-      airplane.mmy = height - 10 -((height-miniMap.yb)/10);
-      userInputInt = null;
-      veloc = 100;
-      airplane.angle = 0;
-      pause = false;
-      nextLevel = false;
+      levelChange(true);
       animation = requestAnimationFrame(draw);
       return;
     }
-    progressBar.count = 0;
-    airports.splice(0,airports.length);
-    pathpoints.splice(0,pathpoints.length);
-    airplane.mmx = (width-miniMap.xb)/2+miniMap.xb;
-    airplane.mmy = height - 10 -((height-miniMap.yb)/10);
-    userInputInt = null;
-    veloc = 100;
-    airplane.angle = 0;
-    pause = false;
-    nextLevel = false;
+    levelChange(true);
     animation = requestAnimationFrame(draw);
   }
 });
@@ -926,12 +937,7 @@ no.addEventListener("click",function(e){
       drawText("42");
       return;
     }
-    pause = false;
-    nextLevel = false;
-    progressBar.level++;
-    progressBar.count = 0; 
-    airports.splice(0,airports.length);
-    pathpoints.splice(0,pathpoints.length);
+    levelChange(false);
     animation = requestAnimationFrame(draw);
   }
 });
@@ -956,6 +962,27 @@ canvas.addEventListener("mouseup",function(e){
   cursor.x = null;
   cursor.y = null;
 });
+
+function levelChange(same){
+  if (!same)
+  {
+    progressBar.level++;
+  }
+  else
+  {
+    airplane.mmx = (width-miniMap.xb)/2+miniMap.xb;
+    airplane.mmy = height - 10 -((height-miniMap.yb)/10);
+    userInputInt = 0;
+    veloc = 100;
+    airplane.angle = 0;
+  }
+  pause = false;
+  nextLevel = false;
+  progressBar.count = 0; 
+  airports.splice(0,airports.length);
+  pathpoints.splice(0,pathpoints.length);
+  prevAngle = userInputInt;
+}
 
 document.addEventListener('keydown', function(e) {
   if (document.querySelector(".info__pause").style.display!="none")
