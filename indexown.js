@@ -34,9 +34,16 @@ var airplane = {
   anglev: null,
   angle: null,
 };
+var cursor = {
+  x: null,
+  y: null,
+  is: false,
+};
 var miniMap ={
   xb: width-300,
   yb: height-310,
+  xe: width,
+  ye: height-10,
   xviszf: null,
   xviszs: null,
   yviszf: null,
@@ -151,11 +158,14 @@ function draw(time) {
         drawSideBox();
       }
       drawMiniMap(miniMap);
-      drawScale(height/10,width/2,height-30);
-      drawPetals(levels[progressBar.level]);
+      if (!cursor.is)
+      {
+        drawPetals(levels[progressBar.level]);
+      }
       outOfMap(airplane);
       drawPath(pathpoints);
       drawAp(airports);
+      drawScale(height/10,width/2,height-30);
       drawAirplane(airplane);
       upgradeLevelInfo(airports);
       progressCheck(progressBar);
@@ -193,38 +203,77 @@ function drawSideBox(){
 function drawScale(km,xb,yb,vertical){
   var x = xb;
   var y = yb;
-  var texttype = ctx.font;
-  ctx.font = "20px sans-serif";
+  var width = 4;
   ctx.save();
+  ctx.textAlign = "center";
+  ctx.font = "20px sans-serif";
+  ctx.beginPath();
   ctx.translate(x,y);
   if (vertical)
   {
     ctx.rotate(Math.PI/2);
   }
-  ctx.moveTo(0,0);
-  ctx.lineTo(0-km/2,0);
-  x = 0-km/2;
-  for (var i=0;i<2;i++)
-  {
-    ctx.lineTo(x,-15);
-    ctx.moveTo(x,0);
-    x-=km;
-    ctx.lineTo(x,0);
-  }
-  ctx.fillText("km",x+15,-5);
-  ctx.moveTo(0,0);
-  ctx.lineTo(0+km/2,0);
   x = 0+km/2;
+  ctx.moveTo(0,width);
+  ctx.lineTo(x,width);
+  ctx.moveTo(0,-width);
+  ctx.lineTo(x,-width);  
   for (var i=0;i<2;i++)
   {
-    ctx.lineTo(x,-15);
-    ctx.moveTo(x,0);
+    ctx.moveTo(x,-width);
+    ctx.lineTo(x,+width);
+    ctx.moveTo(x,-width);
+    ctx.lineTo(x+km,-width);
+    ctx.moveTo(x,+width);
+    ctx.lineTo(x+km,+width);
     x+=km;
-    ctx.lineTo(x,0);
   }
+  ctx.moveTo(x,-width);
+  ctx.lineTo(x,+width);
+  x = 0-km/2;
+  ctx.moveTo(0,width);
+  ctx.lineTo(x,width);
+  ctx.moveTo(0,-width);
+  ctx.lineTo(x,-width);  
+  for (i=0;i<2;i++)
+  {
+    ctx.moveTo(x,-width);
+    ctx.lineTo(x,+width);
+    ctx.moveTo(x,-width);
+    ctx.lineTo(x-km,-width);
+    ctx.moveTo(x,+width);
+    ctx.lineTo(x-km,+width);
+    x-=km;
+  }
+  ctx.moveTo(x,-width);
+  ctx.lineTo(x,+width);
+  ctx.fillText("км",x-20,+5);
+  ctx.fillText("0",x,-6);
+  x+=km/10;
+  for (i=0;i<9;i++)
+  {
+    ctx.moveTo(x,-width);
+    ctx.lineTo(x,+width);
+    if (i%2==0)
+    {
+      ctx.moveTo(x,0);
+      ctx.lineTo(x+km/10,0);
+    }
+    x+=km/10;
+  }
+  for (var i=1;i<5;i++)
+  {
+    ctx.fillText((i).toString(),x,-6);
+    if(i%2==0)
+    {
+      ctx.moveTo(x,0);
+      ctx.lineTo(x+km,0);
+    }
+    x+=km;
+  }
+  ctx.fillText("5",x,-6);
   ctx.stroke();
   ctx.restore();
-  ctx.font = texttype;
 }
 
 function pauseEffect(){
@@ -243,11 +292,11 @@ function drawMiniMap(miniMap){
     miniMap.color = miniMap.color.substr(0,miniMap.color.length-3)+"0.1)";
   }
   ctx.fillStyle = miniMap.color;
-  ctx.moveTo(miniMap.xb,height-10);
+  ctx.moveTo(miniMap.xb,miniMap.ye);
   ctx.lineTo(miniMap.xb,miniMap.yb);
-  ctx.lineTo(width,miniMap.yb);
-  ctx.lineTo(width,height-10);
-  ctx.lineTo(miniMap.xb,height-10);
+  ctx.lineTo(miniMap.xe,miniMap.yb);
+  ctx.lineTo(miniMap.xe,miniMap.ye);
+  ctx.lineTo(miniMap.xb,miniMap.ye);
   ctx.stroke();
   ctx.fill();
   ctx.restore();
@@ -291,47 +340,94 @@ function drawAp(airports){
         ctx.restore();
       }
       ctx.fill();
-      if (airports[i].mmx<=miniMap.xviszs&&airports[i].mmx>=miniMap.xviszf&&airports[i].mmy>=miniMap.yviszf&&airports[i].mmy<=miniMap.yviszs)
+      if (!cursor.is)
       {
-        ctx.strokeStyle = "#000000";
-        ctx.save();
-        ctx.beginPath();
-        ctx.translate(airplane.x,airplane.y);
-        if (longscreen)
+        if (airports[i].mmx<=miniMap.xviszs&&airports[i].mmx>=miniMap.xviszf&&airports[i].mmy>=miniMap.yviszf&&airports[i].mmy<=miniMap.yviszs)
         {
-          airports[i].x = (airports[i].mmx-airplane.mmx)*((width)/(width-miniMap.xb))*5;
-          airports[i].y = (airports[i].mmy-airplane.mmy)*(height/(height-miniMap.yb))*5;
-        }
-        else 
-        {
-          airports[i].x = (airports[i].mmx-airplane.mmx)*((width-2*(width-miniMap.xb))/(width-miniMap.xb))*5;
-          airports[i].y = (airports[i].mmy-airplane.mmy)*(height/(height-miniMap.yb))*5;
-        }
-        ctx.arc(airports[i].x,airports[i].y,15,0,2*Math.PI,true);
-        if (airports[i].angle!==null)
-        {
+          ctx.strokeStyle = "#000000";
           ctx.save();
-          ctx.lineWidth = 5;
-          ctx.translate(airports[i].x,airports[i].y);
-          ctx.rotate(airports[i].angle*Math.PI/180);
-          ctx.moveTo(0,50);
-          ctx.lineTo(0,-50);
-          if (levels[progressBar.level].difficulty==2)
+          ctx.beginPath();
+          ctx.translate(airplane.x,airplane.y);
+          if (longscreen)
           {
-            ctx.moveTo(15,30);
-            ctx.lineTo(-15,30);
+            airports[i].x = (airports[i].mmx-airplane.mmx)*((width)/(width-miniMap.xb))*5;
+            airports[i].y = (airports[i].mmy-airplane.mmy)*(height/(height-miniMap.yb))*5;
           }
-          ctx.stroke();
+          else 
+          {
+            airports[i].x = (airports[i].mmx-airplane.mmx)*((width-2*(width-miniMap.xb))/(width-miniMap.xb))*5;
+            airports[i].y = (airports[i].mmy-airplane.mmy)*(height/(height-miniMap.yb))*5;
+          }
+          ctx.arc(airports[i].x,airports[i].y,15,0,2*Math.PI,true);
+          if (airports[i].angle!==null)
+          {
+            ctx.save();
+            ctx.lineWidth = 5;
+            ctx.translate(airports[i].x,airports[i].y);
+            ctx.rotate(airports[i].angle*Math.PI/180);
+            ctx.moveTo(0,50);
+            ctx.lineTo(0,-50);
+            if (levels[progressBar.level].difficulty==2)
+            {
+              ctx.moveTo(15,30);
+              ctx.lineTo(-15,30);
+            }
+            ctx.stroke();
+            ctx.restore();
+          }
+          collision(airports[i]);
+          ctx.fill();
           ctx.restore();
         }
-        collision(airports[i]);
-        ctx.fill();
-        ctx.restore();
+        else
+        {
+          airports[i].x = null;
+          airports[i].y = null;
+        }
       }
-      else
+      else 
       {
-        airports[i].x = null;
-        airports[i].y = null;
+        if (airports[i].mmx<=(cursor.x+30)&&airports[i].mmx>=(cursor.x-30)&&airports[i].mmy>=(cursor.y-30)&&airports[i].mmy<=(cursor.y+30))
+        {
+          ctx.strokeStyle = "#000000";
+          ctx.save();
+          ctx.beginPath();
+          ctx.translate(airplane.x,airplane.y);
+          if (longscreen)
+          {
+            airports[i].x = (airports[i].mmx-cursor.x)*((width)/(width-miniMap.xb))*5;
+            airports[i].y = (airports[i].mmy-cursor.y)*(height/(height-miniMap.yb))*5;
+          }
+          else 
+          {
+            airports[i].x = (airports[i].mmx-cursor.x)*((width-2*(width-miniMap.xb))/(width-miniMap.xb))*5;
+            airports[i].y = (airports[i].mmy-cursor.y)*(height/(height-miniMap.yb))*5;
+          }
+          ctx.arc(airports[i].x,airports[i].y,15,0,2*Math.PI,true);
+          if (airports[i].angle!==null)
+          {
+            ctx.save();
+            ctx.lineWidth = 5;
+            ctx.translate(airports[i].x,airports[i].y);
+            ctx.rotate(airports[i].angle*Math.PI/180);
+            ctx.moveTo(0,50);
+            ctx.lineTo(0,-50);
+            if (levels[progressBar.level].difficulty==2)
+            {
+              ctx.moveTo(15,30);
+              ctx.lineTo(-15,30);
+            }
+            ctx.stroke();
+            ctx.restore();
+          }
+          ctx.fill();
+          ctx.restore();
+        }
+        else
+        {
+          airports[i].x = null;
+          airports[i].y = null;
+        }
       }
     }
     ctx.restore();
@@ -414,9 +510,12 @@ function drawAirplane(airplane)
   ctx.beginPath();  
   ctx.arc(airplane.mmx,airplane.mmy,3,0,Math.PI*2,true);
   ctx.fill();
-  ctx.translate(airplane.x,airplane.y);
-  ctx.rotate(airplane.angle*Math.PI/180);
-  ctx.drawImage(plane,-20,-20,40,40);
+  if (!cursor.is)
+  {
+    ctx.translate(airplane.x,airplane.y);
+    ctx.rotate(airplane.angle*Math.PI/180);
+    ctx.drawImage(plane,-20,-20,40,40);
+  }
   ctx.restore();
 }
 
@@ -439,21 +538,24 @@ function drawPath(pathpoints){
       ctx.beginPath();
       ctx.arc(pathpoints[i].mmx,pathpoints[i].mmy,1,0,Math.PI*2,true);
       ctx.fill();
-      if (pathpoints[i].mmx<=miniMap.xviszs&&pathpoints[i].mmx>=miniMap.xviszf&&pathpoints[i].mmy>=miniMap.yviszf&&pathpoints[i].mmy<=miniMap.yviszs)
+      if (!cursor.is)
       {
-        ctx.save();
-        ctx.beginPath();
-        ctx.translate(airplane.x,airplane.y);
-        pathpoints[i].x = (pathpoints[i].mmx-airplane.mmx)*((width-2*(width-miniMap.xb))/(width-miniMap.xb))*5;
-        pathpoints[i].y = (pathpoints[i].mmy-airplane.mmy)*(height/(height-miniMap.yb+10))*5;
-        ctx.arc(pathpoints[i].x,pathpoints[i].y,5,0,2*Math.PI,true);
-        ctx.fill();
-        ctx.restore();
-      }
-      else 
-      {
-        pathpoints[i].x = null;
-        pathpoints[i].y = null;
+        if (pathpoints[i].mmx<=miniMap.xviszs&&pathpoints[i].mmx>=miniMap.xviszf&&pathpoints[i].mmy>=miniMap.yviszf&&pathpoints[i].mmy<=miniMap.yviszs)
+        {
+          ctx.save();
+          ctx.beginPath();
+          ctx.translate(airplane.x,airplane.y);
+          pathpoints[i].x = (pathpoints[i].mmx-airplane.mmx)*((width-2*(width-miniMap.xb))/(width-miniMap.xb))*5;
+          pathpoints[i].y = (pathpoints[i].mmy-airplane.mmy)*(height/(height-miniMap.yb+10))*5;
+          ctx.arc(pathpoints[i].x,pathpoints[i].y,5,0,2*Math.PI,true);
+          ctx.fill();
+          ctx.restore();
+        }
+        else 
+        {
+          pathpoints[i].x = null;
+          pathpoints[i].y = null;
+        } 
       }
     }
   }
@@ -854,6 +956,27 @@ no.addEventListener("click",function(e){
     pathpoints.splice(0,pathpoints.length);
     animation = requestAnimationFrame(draw);
   }
+});
+
+canvas.addEventListener("mousedown",function(e){
+  if (e.clientX>miniMap.xb&&e.clientX<miniMap.xe&&e.clientY>miniMap.yb&&e.clientY<miniMap.ye)
+  {
+    cursor.x = e.clientX;
+    cursor.y = e.clientY;
+    cursor.is = true;
+  }
+  else 
+  {
+    cursor.is = false;
+    cursor.x = null;
+    cursor.y = null;
+  }
+});
+
+canvas.addEventListener("mouseup",function(e){
+  cursor.is = false;
+  cursor.x = null;
+  cursor.y = null;
 });
 
 document.addEventListener('keydown', function(e) {
