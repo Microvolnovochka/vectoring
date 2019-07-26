@@ -154,7 +154,6 @@ function draw(time) {
     {
       requestAnimationFrame(draw);
       ctx.clearRect(0, 0, width, height);
-      drawMiniMap(miniMap);
       if (!cursor.is)
       {
         drawPetals(levels[progressBar.level]);
@@ -164,6 +163,7 @@ function draw(time) {
       drawAp(airports);
       drawScale(height/10,width/2,height-30);
       drawAirplane(airplane);
+      drawMiniMap(miniMap);
       upgradeLevelInfo(airports);
       progressCheck(progressBar);
       upgradeInfo();
@@ -516,7 +516,7 @@ function drawPath(pathpoints){
   {
     pathpoints.push(new Point(airplane.mmx,airplane.mmy));
   }
-  if (count==(180/coeffAccel))
+  if (count>=(180/coeffAccel))
   {
     pathpoints.push(new Point(airplane.mmx,airplane.mmy));
     count = 0;
@@ -754,7 +754,7 @@ function upgradeLevelInfo(airports){
 function upgradeInfo(){
   document.querySelector('.cren > span').innerHTML = "15";
   document.querySelector('.course > span').innerHTML = Math.floor(airplane.angle);
-  document.querySelector('.speed > span').innerHTML = veloc;
+  //document.querySelector('.speed > span').innerHTML = veloc;
 }
 
 function isNumPad(e) {
@@ -822,25 +822,13 @@ document.querySelector('.infobuttons').addEventListener('click',function(e){
   }
 });
 
-document.querySelector(".info__plus").addEventListener("click",function(e){
+document.querySelector(".info__speed").addEventListener("input",function(e){
   if (!pause)
   {
-      veloc+=50;
-      if (veloc>1500)
-      {
-        veloc = 1500;
-      }
-  }
-});
-
-document.querySelector(".info__minus").addEventListener("click",function(e){
-  if (!pause)
-  {
-    veloc-=50;
-    if (veloc<100)
-    {
-      veloc = 100;
-    }
+    document.querySelector('.speed > span').innerHTML = e.target.value;
+    document.querySelector(".info__speed").addEventListener("change",function(e){
+    veloc = e.target.value;
+    });
   }
 });
 
@@ -1015,18 +1003,6 @@ document.addEventListener('keydown', function(e) {
       }
     } else if (isNumPad(e)) {
       userInput = '' + userInput.toString().slice(1) + (e.key ? e.key : e.keyIdentifier.slice(-1));
-    } else if ((e.which==107||e.which==61)&&!pause) {
-      veloc+=50;
-      if (veloc>1500)
-      {
-        veloc = 1500;
-      }
-    } else if ((e.which==109||e.which==173)&&!pause) {
-      veloc-=50;
-      if (veloc<100)
-      {
-        veloc = 100;
-      }
     } else if(e.which==89&&pause==true&&nextLevel==true){
       if (progressBar.level==6)
       {

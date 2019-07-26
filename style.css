@@ -106,17 +106,13 @@
   left: 1%;
 }
 
-.info__minus{
-  margin: 5%;
-  height: 20px;
-  width: 20px;
-  background-color:  #9C9C9C; 
+.info__speed{
+  width: 70%;
 }
 
-.info__plus{
-  margin: 5%;
-  height: 100px;
-  width: 100px;
+.info__speeddisplay{
+  font-size: 140%;
+  width:25%;
   background-color:  #9C9C9C; 
 }
 

@@ -13,15 +13,17 @@
     <div class="info__parametrs">
       <p class="cren">КРЕН: <span>0</span></p>
       <p class="course">КУРС: <span>0</span></p>
-      <p class="speed">СКОРОСТЬ:<span>0</span></p>
+      <p class="speed">СКОРОСТЬ:<span>100</span></p>
     </div>
   </div>
   <div class="infobuttons"> Скорость
     <p>
-        <span class="info__minus">-</span>
+      <input type="range" defaultValue="100" class="info__speed" min="100" max="1500" step="50">
+      <span class="info__speeddisplay">100</span>
+    </p>
+    <p>
         <span class="info__pause"> || </span>
         <span class="info__play"> ► </span>
-        <span class="info__plus"> +</span>
         <span class="info__ff"> ►► </span>
     </p>
   </div>
