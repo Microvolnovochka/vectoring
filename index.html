@@ -8,33 +8,51 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body id="body">
-  <div class="info">
-    <p>Параметры полета</p>
-    <div class="info__parametrs">
-      <p class="cren">КРЕН: <span>0</span></p>
-      <p class="course">КУРС: <span>0</span></p>
-      <p class="speed">СКОРОСТЬ:<span>100</span></p>
-    </div>
-  </div>
-  <div class="infobuttons"> Скорость
-    <p>
-      <input type="range" defaultValue="100" class="info__speed" min="100" max="1500" step="50">
-      <span class="info__speeddisplay">100</span>
-    </p>
-    <p>
-        <span class="info__pause"> || </span>
-        <span class="info__play"> ► </span>
-        <span class="info__ff"> ►► </span>
-    </p>
-  </div>
-  <div class="levelsinfo">
-    <p class="level">УРОВЕНЬ <span></span></p>
-    <div class="levelsinfo__airports">
-      <p class="airport">АЭРОПОРТ <span>&nbsp;</span></p>
-      <p class="povorots">&nbsp;</p>
-      <p class="airport">АЭРОПОРТ <span>&nbsp;</span></p>
-      <p class="povorots">&nbsp;</p>
-    </div>
+  <div class="sidebar">
+      <div class="info">
+          <p>Параметры полета</p>
+          <div class="info__parametrs">
+            <p class="cren">КРЕН: <span>0</span></p>
+            <p class="course">КУРС: <span>0</span></p>
+            <p class="speed">СКОРОСТЬ:<span>100</span></p>
+          </div>
+        </div>
+        <div class="infocontrol"> Скорость
+          <p>
+            <div class="info__speeddisplay">100</div>
+            <input type="range" value="100" class="info__speed" min="100" max="1500" step="50">
+          </p>
+          <p  class="infobuttons">
+              <div class="info__pause"> || </div>
+              <div class="info__play"> ► </div>
+              <div class="info__ff"> ►► </div>
+          </p>
+        </div>
+        <div class="levelsinfo">
+          <p class="level">УРОВЕНЬ <span>&nbsp;</span></p>
+          <div class="levelsinfo__airports">
+            <p class="airport">АЭРОПОРТ <span>&nbsp;</span></p>
+            <p class="povorots">&nbsp;</p>
+            <p class="airport">АЭРОПОРТ <span>&nbsp;</span></p>
+            <p class="povorots">&nbsp;</p>
+          </div>
+        </div>
+        <div class="keyboard-container">
+          <div class="keyboard__name">Задатчик курса</div>
+          <div class="keyboard-display">000</div>
+          <button class="keyboard-key" value="9">9</button>
+          <button class="keyboard-key" value="8">8</button>
+          <button class="keyboard-key" value="7">7</button>
+          <button class="keyboard-key" value="6">6</button>
+          <button class="keyboard-key" value="5">5</button>
+          <button class="keyboard-key" value="4">4</button>
+          <button class="keyboard-key" value="3">3</button>
+          <button class="keyboard-key" value="2">2</button>
+          <button class="keyboard-key" value="1">1</button>
+          <button class="keyboard-key keyboard-enter" value="enter">Ввод</button>
+          <button class="keyboard-key keyboard-reset" value="reset">Сброс</button>
+          <button class="keyboard-key" value="0">0</button>
+        </div>
   </div>
   <button class="yesbt">Перепройти его</button>
   <button class="nobt">Перейти на следующий уровень</button>
@@ -46,22 +64,6 @@
     <option value="4">4</option>
     <option value="5">5</option>
   </select>
-  <div class="keyboard-container">
-    <div class="keyboard__name">Задатчик курса</div>
-    <div class="keyboard-display">000</div>
-    <button class="keyboard-key" value="9">9</button>
-    <button class="keyboard-key" value="8">8</button>
-    <button class="keyboard-key" value="7">7</button>
-    <button class="keyboard-key" value="6">6</button>
-    <button class="keyboard-key" value="5">5</button>
-    <button class="keyboard-key" value="4">4</button>
-    <button class="keyboard-key" value="3">3</button>
-    <button class="keyboard-key" value="2">2</button>
-    <button class="keyboard-key" value="1">1</button>
-    <button class="keyboard-key keyboard-enter" value="enter">Ввод</button>
-    <button class="keyboard-key keyboard-reset" value="reset">Сброс</button>
-    <button class="keyboard-key" value="0">0</button>
-  </div>
   <script src="indexown.js"></script>
 </body>
 </html>
