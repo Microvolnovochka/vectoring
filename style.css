@@ -10,8 +10,14 @@
   -moz-user-select: none;
 }
 
-.sidebar{
+.left_sidebar{
   position: relative;
+}
+
+.right_sidebar{
+  position: absolute;
+  right: 210px;
+  top: 10px;
 }
 
 .yesbt{
@@ -96,12 +102,13 @@
   width: 200px;
   height: 8%;
   font-size: 100%;
-  top: 17%;
+  top: 2%;
   left: 10px;
 }
 
 .info__parametrs{
-  background-color: #9C9C9C; 
+  background-color: #dbdbdb;
+  height: 100px;
 }
 
 .infocontrol{
@@ -183,9 +190,6 @@
   position: absolute;
   font-size: 100%;
   width: 200px;
-  height: 10%;
-  top: 6%;
-  left: 10px;
   text-align: left;
 }
 
