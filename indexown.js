@@ -123,8 +123,8 @@ ctx.textAlign = 'center';
 if (localStorage.getItem('eris-value:theme') === 'gray') {
   body.style.background = '#303030';
   body.style.color = 'white';
-  display.style.background = 'black';
-  display.style.color = '#ffff00';
+  //display.style.background = 'black';
+  //display.style.color = '#ffff00';
   ctx.strokeStyle = '#b9b9b9';
   ctx.fillStyle = 'white';
   plane.src = 'images/airplane-white.png';
@@ -133,8 +133,8 @@ if (localStorage.getItem('eris-value:theme') === 'gray') {
   body.style.color = 'black';
   ctx.strokeStyle = '#3d3d3d';
   ctx.fillStyle = 'black';
-  display.style.background = 'linear-gradient(#c9cac4, #7c9caf)';
-  display.style.color = 'black';
+  //display.style.background = 'linear-gradient(#c9cac4, #7c9caf)';
+  //display.style.color = 'black';
   plane.src = 'images/airplane-black.png';
 }
 

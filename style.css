@@ -63,12 +63,12 @@
   -webkit-flex-grow: 1;
   flex-grow: 1;
   font-size: 17px;
-  background: #b9b9b9;
+  background: #dbdbdb;
 }
 
 .keyboard-display {
-  background: #000;
-  color: #ffff00;
+  background: #dbdbdb;
+  color: #000;
   display: -webkit-flex;
   display: flex;
   -webkit-flex-basis: 100%;
