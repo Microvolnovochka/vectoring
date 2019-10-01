@@ -8,40 +8,34 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body id="body">
-  <div class="right_sidebar">
-      <div class="levelsinfo">
-          <p class="level">УРОВЕНЬ <span>&nbsp;</span></p>
-          <div class="levelsinfo__airports">
-            <p class="airport">АЭРОПОРТ <span>&nbsp;</span></p>
-            <p class="povorots">&nbsp;</p>
-            <p class="airport">АЭРОПОРТ <span>&nbsp;</span></p>
-            <p class="povorots">&nbsp;</p>
-          </div>
-        </div>
-  </div>
   <div class="left_sidebar">
       <div class="info">
-          <p>Параметры полета</p>
+          <p>ПАРАМЕТРЫ ПОЛЕТА</p>
           <div class="info__parametrs">
-            <p class="cren">КРЕН: <span>0</span></p>
-            <p class="course">КУРС: <span>0</span></p>
-            <p class="speed">СКОРОСТЬ:<span>100</span></p>
+            <div class="info__parametrs__text">
+                <p class="cren">Крен: <span>0</span></p>
+                <p class="course">Курс: <span>0</span></p>
+                <p class="speed">Скорость:<span>100</span></p>
+            </div>
           </div>
-        </div>
-        <div class="infocontrol"> Скорость
-          <p>
-            <div class="info__speeddisplay">100</div>
-            <input type="range" value="100" class="info__speed" min="100" max="1500" step="50">
-          </p>
-          <p  class="infobuttons">
-              <img src="images/pause.svg" class="info__pause"> 
-              <img src="images/play.svg" class="info__play"> 
-              <img src="images/ff.svg" class="info__ff"> 
+      </div>
+      <div class="info__control"> СКОРОСТЬ
+          <div class="info__speed__display">
+            <div class="info__speed__text">
+              100
+            </div>
+            <div class="info__speed">
+                <input type="range" value="100"  min="100" max="950" step="50">
+            </div>
+          </div>
+          <img src="images/pause.svg" class="info__pause" width="50px" height="30px"> 
+          <img src="images/play.svg" class="info__play"> 
+          <img src="images/ff.svg" class="info__ff"> 
+          <div class="info__ff__koef"><span>1</span></div>
               <!--<div class="info__ff"> ►► </div>
               <div class="info__pause"> || </div>
               <div class="info__play"> ► </div>-->
-          </p>
-        </div>
+      </div>
         <div class="keyboard-container">
           <div class="keyboard__name">Задатчик курса</div>
           <div class="keyboard-display">000</div>
@@ -57,6 +51,17 @@
           <button class="keyboard-key keyboard-enter" value="enter">Ввод</button>
           <button class="keyboard-key" value="0">0</button>
           <button class="keyboard-key keyboard-reset" value="reset">Сброс</button>
+        </div>
+  </div>
+  <div class="right_sidebar">
+      <div class="levelsinfo">
+          <p class="level">УРОВЕНЬ <span>&nbsp;</span></p>
+          <div class="levelsinfo__airports">
+            <p class="airport">АЭРОПОРТ <span>&nbsp;</span></p>
+            <p class="povorots">&nbsp;</p>
+            <p class="airport">АЭРОПОРТ <span>&nbsp;</span></p>
+            <p class="povorots">&nbsp;</p>
+          </div>
         </div>
   </div>
   <button class="yesbt">Перепройти его</button>

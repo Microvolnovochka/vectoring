@@ -14,6 +14,90 @@
   position: relative;
 }
 
+.info {
+  position: relative;
+  height: 150px;
+  font-size: 100%;
+  top: 20px;
+  left: 20px;
+}
+
+.info__parametrs{
+  position: relative;
+  background-color: #dbdbdb;
+  width: 200px;
+  top: 10px;
+  height: 100px;
+}
+
+.info__parametrs__text{
+  position: relative;
+  top: 15px;
+  left: 15px;
+}
+
+.info__control{
+  position: relative;
+  width: 200px;
+  top: 10%;
+  left: 20px;
+}
+
+.info__speed__display{
+  position: relative;
+  display: block;
+  top: 15px;
+  width: 200px;
+  height: 35px;
+  font-size: 140%;
+  background-color:  #dbdbdb;
+}
+
+.info__speed__text{
+  position: relative;
+  text-align: center;
+  top: 5px;
+  left: 5px;
+  width:40px;
+  background-color: #9C9C9C;
+}
+
+.info__speed{
+  position: relative;
+  top: -20px;
+  left: 50px;
+}
+
+.info__speed input{
+  width:140px;
+}
+
+.info__buttons{
+  position: relative;
+  top: 10px;
+}
+
+.info__pause{
+  position: relative;
+  top: -20px;
+}
+
+.info__play{
+  text-align: center;
+  font-size: 200%;
+  width: 30%;
+  display: none;
+  background-color:  #9C9C9C; 
+}
+
+.info__ff{
+  display: inline-block;
+  font-size: 200%;
+  width: 30%;
+  margin: 5%;
+  background-color:  #9C9C9C; 
+}
+
 .right_sidebar{
   position: absolute;
   right: 210px;
@@ -59,6 +143,7 @@
   flex-direction: row-reverse;
   width: 200px;
   height: 35%;
+  
 }
 
 .keyboard-key {
@@ -68,12 +153,13 @@
   flex-shrink: 0;
   -webkit-flex-grow: 1;
   flex-grow: 1;
-  font-size: 17px;
-  background: #dbdbdb;
+  font-size: 16px;
+  background-color: #dbdbdb;
+  border: 1px solid #ffffff;
 }
 
 .keyboard-display {
-  background: #dbdbdb;
+  background: #dbdbdb;  
   color: #000;
   display: -webkit-flex;
   display: flex;
@@ -85,72 +171,6 @@
   align-items: center;
   font-size: 50px;
   font-family: sans-serif;
-  border: 2px solid #b9b9b9;
-}
-
-.state-0::after {
-  position: absolute;
-  content: '';
-  left: 0px;
-  height: 100%;
-  width: 0%;
-  background: #fff;
-}
-
-.info {
-  position: absolute;
-  width: 200px;
-  height: 8%;
-  font-size: 100%;
-  top: 2%;
-  left: 10px;
-}
-
-.info__parametrs{
-  background-color: #dbdbdb;
-  height: 100px;
-}
-
-.infocontrol{
-  position: absolute;
-  width: 200px;
-  top:26%;
-  left: 10px;
-}
-
-.infobuttons{
-
-}
-
-.info__speed{
-  position: absolute;
-  width: 73%;
-  left: 25%;
-}
-
-
-.info__speeddisplay{
-  text-align: center;
-  display: inline-block;
-  width: 24%;
-  font-size: 140%;
-  background-color:  #9C9C9C;
-}
-
-.info__play{
-  text-align: center;
-  font-size: 200%;
-  width: 30%;
-  display: none;
-  background-color:  #9C9C9C; 
-}
-
-.info__ff{
-  display: inline-block;
-  font-size: 200%;
-  width: 30%;
-  margin: 5%;
-  background-color:  #9C9C9C; 
 }
 
 .info__ff:hover{

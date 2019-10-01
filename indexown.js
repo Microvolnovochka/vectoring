@@ -802,6 +802,7 @@ function upgradeInfo(){
   document.querySelector('.cren > span').innerHTML = "15";
   document.querySelector('.course > span').innerHTML = Math.floor(airplane.angle);
   document.querySelector('.speed > span').innerHTML = veloc;
+  document.querySelector('.info__ff__koef > span').innerHTML = coeffAccel;
 }
 
 function isNumPad(e) {
@@ -851,7 +852,7 @@ document.querySelector(".select-level").addEventListener("change",function(e){
   animation = requestAnimationFrame(draw);
 });
 
-document.querySelector('.infocontrol').addEventListener('click',function(e){
+document.querySelector('.info__control').addEventListener('click',function(e){
   var target =e.target;
   if (target.className=="info__pause"&&!pause)
   {
@@ -872,7 +873,7 @@ document.querySelector('.infocontrol').addEventListener('click',function(e){
 document.querySelector(".info__speed").addEventListener("input",function(e){
   if (!pause)
   {
-    document.querySelector('.info__speeddisplay').innerHTML = e.target.value;
+    document.querySelector('.info__speed__text').innerHTML = e.target.value;
     document.querySelector(".info__speed").addEventListener("change",function(e){
     inputVeloc = e.target.value;
     });
