@@ -74,28 +74,30 @@
 
 .info__buttons{
   position: relative;
-  top: 10px;
+  top: 0px;
 }
 
 .info__pause{
   position: relative;
-  top: -20px;
+  left: -2px;
+  width: 50px;
+  height: 45px;
 }
 
 .info__play{
-  text-align: center;
-  font-size: 200%;
-  width: 30%;
+  position: relative;
+  left: -2px;
+  width: 50px;
+  height: 45px;
   display: none;
-  background-color:  #9C9C9C; 
 }
 
 .info__ff{
-  display: inline-block;
-  font-size: 200%;
-  width: 30%;
+  position: relative;
+  top:10px;
+  width: 50px;
+  height: 45px;
   margin: 5%;
-  background-color:  #9C9C9C; 
 }
 
 .right_sidebar{
@@ -187,13 +189,6 @@
 
 .info__speed:hover{
   cursor: pointer;
-}
-.info__pause{
-  text-align: center;
-  display: inline-block;
-  font-size: 200%;
-  width:30%;
-  background-color:  #9C9C9C; 
 }
 
 .info p {
