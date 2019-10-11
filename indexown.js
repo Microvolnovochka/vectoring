@@ -265,7 +265,7 @@ function drawScale(km,xb,yb,vertical){
 
 function pauseEffect(){
   ctx.save();
-  ctx.fillStyle = "rgba(54, 48, 48, 0.5)";
+  ctx.fillStyle = "rgba(148, 149, 147, 0.5)";
   ctx.fillRect(0,0,width,height);
   ctx.restore();
 }
