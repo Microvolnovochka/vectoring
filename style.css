@@ -334,10 +334,32 @@
   height:100%;
 }
 
-@media (min-height:1081px)
+@media (max-aspect-ratio: 1/1)
 {
+  .left_sidebar{
+    position: absolute;
+    top: 100%;
+    height: 35%;
+  }
+
+  .right_sidebar{
+    position: absolute;
+    top: 100%;
+    height: 35%;
+  }
+
+  .info {
+    position: relative;
+    height: 25%;
+    font-size: 100%;
+    top: 0px;
+    left: 20px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 600;
+  }
+
   .select-level {
-    /*display: none;*/
+    display: none;
     position: absolute;
     top: 1085px;
     left: 10px;
@@ -345,7 +367,6 @@
   
   .keyboard-container {
     position: absolute;
-    top: 1230px;
     left: 10px;
     display: -webkit-flex;
     display: flex;
@@ -369,8 +390,6 @@
   }
   
   .keyboard-display {
-    background: #000;
-    color: #ffff00;
     display: -webkit-flex;
     display: flex;
     -webkit-flex-basis: 100%;
@@ -384,28 +403,4 @@
     border: 2px solid #b9b9b9;
   }
   
-  .info {
-    position: absolute;
-    width: 25%;
-    font-size: 25px;
-    top: 1110px;
-    left: 20px;
-  }
-  
-  .info p {
-    margin: 0;
-  }
-  
-  .levelsinfo {
-    position: absolute;
-    font-size: 120%;
-    width: 20%;
-    height: 20%;
-    top: 1090px;
-    right: 20px;
-  }
-
-  .levelsinfo .level {
-    text-align: center;
-  }
 }

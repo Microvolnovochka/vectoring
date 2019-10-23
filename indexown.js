@@ -6,9 +6,9 @@ var endwindow = document.querySelector(".level_end_window");
 var yes = document.querySelector(".yesbt");
 var no = document.querySelector(".nobt");
 var ctx = canvas.getContext('2d');
-var width = ctx.canvas.width;
+var width = ctx.canvas.width = window.innerWidth;
 var longscreen = window.innerHeight<=1080?false:true;
-var height = ctx.canvas.height = window.innerHeight>1080?1080:window.innerHeight - 1;
+var height = ctx.canvas.height = window.innerHeight<window.innerWidth?window.innerHeight:window.innerHeight*0.65;
 var MAX = height>width?height:width;
 var MIN = height<width?height:width;
 var pause = false;
@@ -795,7 +795,7 @@ function upgradeLevelInfo(airports){
     par.querySelector(".level > span").innerHTML = progressBar.level.toString();
     for (var i =0;i<levels[progressBar.level].airpotrN;i++)
     {
-      par.querySelectorAll(".airport > span")[i].innerHTML = (i+1).toString()+" - "+str;
+      par.querySelectorAll(".povorots")[i].innerHTML = str;
     }
     
   }
