@@ -2,10 +2,11 @@
 var display = document.querySelector('.keyboard-display');
 var canvas = document.getElementById('field');
 var body = document.getElementById('body');
+var endwindow = document.querySelector(".level_end_window");
 var yes = document.querySelector(".yesbt");
 var no = document.querySelector(".nobt");
 var ctx = canvas.getContext('2d');
-var width = ctx.canvas.width = window.innerWidth;
+var width = ctx.canvas.width;
 var longscreen = window.innerHeight<=1080?false:true;
 var height = ctx.canvas.height = window.innerHeight>1080?1080:window.innerHeight - 1;
 var MAX = height>width?height:width;
@@ -50,7 +51,7 @@ var miniMap ={
   xviszs: null,
   yviszf: null,
   yviszs: null,
-  color: "#9C9C9C",
+  color: "#dbdbdb",
 };
 var cren = {
   15:{
@@ -87,7 +88,7 @@ var cren = {
 };
 var progressBar = {
   level: 1,
-  count: 0,
+  count: 2,
 };
 var levels = {
   1: {
@@ -273,9 +274,9 @@ function pauseEffect(){
 function drawMiniMap(miniMap){
   ctx.save();
   ctx.lineWidth = 2;
+  ctx.strokeStyle = "#c0c1be";
   if (longscreen)
   {
-    ctx.strokeStyle = "#ffffff";
     miniMap.color = miniMap.color.substr(0,miniMap.color.length-3)+"0.1)";
   }
   ctx.fillStyle = miniMap.color;
@@ -715,11 +716,11 @@ function progressCheck(progress){
     cancelAnimationFrame(animation);
     pause = true;
     nextLevel = true;
-    yes.style.display = "block";
-    yes.innerHTML = "Перепройти его";
-    no.style.display = "block";
-    no.innerHTML = "Перейти на следующий";
-    drawText("Вы закончили уровень №"+progress.level.toString());
+    endwindow.style.display = "block";
+    //yes.innerHTML = "Перепройти его";
+    //no.style.display = "block";
+    //no.innerHTML = "Перейти на следующий";
+    //drawText("Вы закончили уровень №"+progress.level.toString());
     return;
   }
   for (var i=0;i<airports.length;i++)
@@ -780,11 +781,13 @@ function upgradeLevelInfo(airports){
     {
       if (airports[i].collision)
       {
-        str = "пройден";
-        par.querySelectorAll(".povorots")[i].innerHTML = "Поворотов: "+airports[i].povorotn.toString()
+        par.querySelectorAll(".povorots")[i].innerHTML = "Поворотов: "+airports[i].povorotn.toString();
       }
-      par.querySelectorAll(".airport > span")[i].innerHTML = (i+1).toString()+" - "+str;
-      str = "не пройден";
+      else
+      {
+        par.querySelectorAll(".povorots")[i].innerHTML = str;
+      }
+      par.querySelectorAll(".airport > span")[i].innerHTML = (i+1).toString();
     }
   }
   else 
@@ -935,20 +938,19 @@ window.addEventListener('resize',throttle(function(e){
   if (document.documentElement.clientHeight>1080)
   {
     longscreen = true;
-    height = ctx.canvas.height = 1080;
+    height = ctx.canvas.height;
   }
   else
   {
     longscreen = false;
-    height = ctx.canvas.height = window.innerHeight;
+    height = ctx.canvas.height;
   }
 },500));
 
 yes.addEventListener("click", function(e){
   if (pause==true&&nextLevel==true)
   {
-    yes.style.display = "none";
-    no.style.display = "none";
+    endwindow.style.display = "none";
     if (progressBar.level==6)
     {
       progressBar.level = 1;
@@ -964,8 +966,7 @@ yes.addEventListener("click", function(e){
 no.addEventListener("click",function(e){
   if (pause==true&&nextLevel==true)
   {
-    yes.style.display = "none";
-    no.style.display = "none";
+    endwindow.style.display = "none";
     if (progressBar.level==6)
     {
       nextLevel = false;

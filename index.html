@@ -39,36 +39,46 @@
             
           </div>
       </div>
-        <div class="keyboard-container">
-          <div class="keyboard__name">Задатчик курса</div>
-          <div class="keyboard-display">000</div>
-          <button class="keyboard-key" value="9">9</button>
-          <button class="keyboard-key" value="8">8</button>
-          <button class="keyboard-key" value="7">7</button>
-          <button class="keyboard-key" value="6">6</button>
-          <button class="keyboard-key" value="5">5</button>
-          <button class="keyboard-key" value="4">4</button>
-          <button class="keyboard-key" value="3">3</button>
-          <button class="keyboard-key" value="2">2</button>
-          <button class="keyboard-key" value="1">1</button>
-          <button class="keyboard-key keyboard-enter" value="enter">Ввод</button>
-          <button class="keyboard-key" value="0">0</button>
-          <button class="keyboard-key keyboard-reset" value="reset">Сброс</button>
-        </div>
+      <div class="keyboard">
+        <p>ЗАДАТЧИК КУРСА</p>
+          <div class="keyboard-container">
+              <div class="keyboard-display">000</div>
+              <button class="keyboard-key" value="9">9</button>
+              <button class="keyboard-key" value="8">8</button>
+              <button class="keyboard-key" value="7">7</button>
+              <button class="keyboard-key" value="6">6</button>
+              <button class="keyboard-key" value="5">5</button>
+              <button class="keyboard-key" value="4">4</button>
+              <button class="keyboard-key" value="3">3</button>
+              <button class="keyboard-key" value="2">2</button>
+              <button class="keyboard-key" value="1">1</button>
+              <button class="keyboard-key keyboard-enter" value="enter">Ввод</button>
+              <button class="keyboard-key" value="0">0</button>
+              <button class="keyboard-key keyboard-reset" value="reset">Сброс</button>
+          </div>
+      </div>
   </div>
   <div class="right_sidebar">
       <div class="levelsinfo">
           <p class="level">УРОВЕНЬ <span>&nbsp;</span></p>
           <div class="levelsinfo__airports">
-            <p class="airport">АЭРОПОРТ <span>&nbsp;</span></p>
+            <p class="airport">АЭРОПОРТ <span>&nbsp;</span> </p>
             <p class="povorots">&nbsp;</p>
             <p class="airport">АЭРОПОРТ <span>&nbsp;</span></p>
             <p class="povorots">&nbsp;</p>
           </div>
         </div>
   </div>
-  <button class="yesbt">Перепройти его</button>
-  <button class="nobt">Перейти на следующий уровень</button>
+  <div class="level_end_window">
+      <div class="level_end_window_topblock">
+        <p class="level_clear_text">УРОВЕНЬ ПРОЙДЕН</p>
+      </div>
+      <div class="level_end_window_bottomblock">
+          <button class="yesbt">ПОВТОРИТЬ УРОВЕНЬ</button>
+          <button class="nobt">СЛЕДУЮЩИЙ УРОВЕНЬ</button>
+      </div>
+      
+  </div>
   <canvas id="field" class="canvclass"></canvas>
   <select class="select-level">
     <option value="1" selected="selected">1</option>
