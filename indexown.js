@@ -8,7 +8,7 @@ var no = document.querySelector(".nobt");
 var ctx = canvas.getContext('2d');
 var width = ctx.canvas.width = window.innerWidth;
 var longscreen = window.innerHeight<=1080?false:true;
-var height = ctx.canvas.height = window.innerHeight<window.innerWidth?window.innerHeight:window.innerHeight*0.65;
+var height = ctx.canvas.height = window.innerHeight<window.innerWidth?window.innerHeight:window.innerHeight*0.8;
 var MAX = height>width?height:width;
 var MIN = height<width?height:width;
 var pause = false;
@@ -88,7 +88,7 @@ var cren = {
 };
 var progressBar = {
   level: 1,
-  count: 2,
+  count: 0,
 };
 var levels = {
   1: {
@@ -117,6 +117,10 @@ var levels = {
     difficulty: 2,
   }
 };
+var colors ={
+  airportcol1: null,
+  airportcol2: null,
+};
 ctx.lineWidth = 1;
 ctx.font = "30px sans-serif";
 ctx.textAlign = 'center';
@@ -134,6 +138,8 @@ if (localStorage.getItem('eris-value:theme') === 'gray') {
   body.style.color = 'black';
   ctx.strokeStyle = '#3d3d3d';
   ctx.fillStyle = 'black';
+  colors.airportcol1 = "#FA9A14";
+  colors.airportcol2 = "#4443ea";
   //display.style.background = 'linear-gradient(#c9cac4, #7c9caf)';
   //display.style.color = 'black';
   plane.src = 'images/airplane-black.png';
@@ -152,6 +158,7 @@ function draw(time) {
   {
     if (!pause)
     {
+      document.querySelector(".right_sidebar").style.zIndex = 0;
       requestAnimationFrame(draw);
       ctx.clearRect(0, 0, width, height);
       if (!cursor.is)
@@ -268,6 +275,8 @@ function pauseEffect(){
   ctx.save();
   ctx.fillStyle = "rgba(148, 149, 147, 0.5)";
   ctx.fillRect(0,0,width,height);
+  drawMiniMap(miniMap);
+  document.querySelector(".right_sidebar").style.zIndex = 2;
   ctx.restore();
 }
 
@@ -275,10 +284,6 @@ function drawMiniMap(miniMap){
   ctx.save();
   ctx.lineWidth = 2;
   ctx.strokeStyle = "#c0c1be";
-  if (longscreen)
-  {
-    miniMap.color = miniMap.color.substr(0,miniMap.color.length-3)+"0.1)";
-  }
   ctx.fillStyle = miniMap.color;
   ctx.moveTo(miniMap.xb,miniMap.ye);
   ctx.lineTo(miniMap.xb,miniMap.yb);
@@ -292,10 +297,10 @@ function drawMiniMap(miniMap){
   ctx.strokeStyle = "#000000";
   for (var i=0;i<airports.length;i++)
   {
-    ctx.fillStyle = '#ffbe00';
+    ctx.fillStyle = colors.airportcol1;
       if (airports[i].collision)
       {
-        ctx.fillStyle = "#00ff00";
+        ctx.fillStyle = colors.airportcol2;
       }
       ctx.beginPath();
       ctx.arc(airports[i].mmx,airports[i].mmy, 3, 0, Math.PI * 2, true);
@@ -318,7 +323,7 @@ function drawMiniMap(miniMap){
   }
   ctx.restore();
   ctx.save();
-  ctx.fillStyle = "#00ff00";
+  ctx.fillStyle = colors.airportcol2;
   for (i=0;i<pathpoints.length;i++)
   {
     ctx.beginPath();
@@ -357,10 +362,10 @@ function drawAp(airports){
     }
     for (i=0;i<airports.length;i++)
     {
-      ctx.fillStyle = '#ffbe00';
+      ctx.fillStyle = colors.airportcol1;
       if (airports[i].collision)
       {
-        ctx.fillStyle = "#00ff00";
+        ctx.fillStyle = colors.airportcol2;
       }
       if (airports[i].mmx<=miniMap.xviszs&&airports[i].mmx>=miniMap.xviszf&&airports[i].mmy>=miniMap.yviszf&&airports[i].mmy<=miniMap.yviszs)
       {
@@ -561,7 +566,7 @@ function drawAirplane(airplane)
 
 function drawPath(pathpoints){
   ctx.save();
-  ctx.fillStyle = "#00ff00";
+  ctx.fillStyle = colors.airportcol2;
   if (!pathpoints.length)
   {
     pathpoints.push(new Point(airplane.mmx,airplane.mmy));
@@ -717,10 +722,6 @@ function progressCheck(progress){
     pause = true;
     nextLevel = true;
     endwindow.style.display = "block";
-    //yes.innerHTML = "Перепройти его";
-    //no.style.display = "block";
-    //no.innerHTML = "Перейти на следующий";
-    //drawText("Вы закончили уровень №"+progress.level.toString());
     return;
   }
   for (var i=0;i<airports.length;i++)
@@ -774,17 +775,19 @@ function Airport(){
 function upgradeLevelInfo(airports){
   var par = document.querySelector(".levelsinfo");
   var level = par.querySelector(".level > span");
-  var str = "не пройден";
+  var str = "НЕ ПРОЙДЕН";
   if (level.innerHTML==progressBar.level.toString()&&airports.length)
   {
     for (var i =0;i<levels[progressBar.level].airpotrN;i++)
     {
       if (airports[i].collision)
       {
+        par.querySelectorAll(".povorots")[i].style.color = colors.airportcol2;
         par.querySelectorAll(".povorots")[i].innerHTML = "Поворотов: "+airports[i].povorotn.toString();
       }
       else
       {
+        par.querySelectorAll(".povorots")[i].style.color = colors.airportcol1;
         par.querySelectorAll(".povorots")[i].innerHTML = str;
       }
       par.querySelectorAll(".airport > span")[i].innerHTML = (i+1).toString();
