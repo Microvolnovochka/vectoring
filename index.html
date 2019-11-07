@@ -10,37 +10,43 @@
 <body id="body">
   <div class="left_sidebar">
       <div class="info">
-          <p>ПАРАМЕТРЫ ПОЛЕТА</p>
-          <div class="info__parametrs">
-            <div class="info__parametrs__text">
+          <p class="head">ПАРАМЕТРЫ ПОЛЕТА</p>
+          <div class="info_parametrs">
+            <div class="info_parametrs_text">
                 <p class="cren">Крен: <span>0</span></p>
                 <p class="course">Курс: <span>0</span></p>
                 <p class="speed">Скорость:<span>100</span></p>
             </div>
           </div>
       </div>
-      <div class="info__control"> 
-        <p>СКОРОСТЬ</p>
-          <div class="info__speed__display">
-            <div class="info__speed__text">
+      <div class="info_control"> 
+        <p class="head">СКОРОСТЬ</p>
+          <div class="info_speed_display">
+            <div class="info_speed_text">
               100
             </div>
-            <div class="info__speed">
+            <div class="info_speed">
                 <input type="range" value="100"  min="100" max="950" step="50">
             </div>
           </div>
-          <div class="info__buttons">
-            <img src="images/pause.svg" class="info__pause"> 
-            <img src="images/play.svg" class="info__play"> 
-            <div class="info__ff__block">
-                <img src="images/ff.svg" class="info__ff"> 
-                <div class="info__ff__koef"><span>1</span></div>
+          <div class="info_buttons">
+            <div class="info_pause">  
+              <div class ="info_pause_button">&nbsp;</div>
+            </div>
+            <div class="info_play">  
+              <div class ="info_play_button">&nbsp;</div>
+            </div>
+            <div class="info_ff_block">
+                <div class="info_ff"> 
+                    <div class ="info_ff_button">&nbsp;</div>
+                </div>
+                <div class="info_ff_koef"><span>1</span></div>
             </div>
             
           </div>
       </div>
       <div class="keyboard">
-        <p>ЗАДАТЧИК КУРСА</p>
+        <p class="head">ЗАДАТЧИК КУРСА</p>
           <div class="keyboard-container">
               <div class="keyboard-display">000</div>
               <button class="keyboard-key" value="9">9</button>
@@ -74,11 +80,36 @@
         <p class="level_clear_text">УРОВЕНЬ ПРОЙДЕН</p>
       </div>
       <div class="level_end_window_bottomblock">
-          <button class="yesbt">ПОВТОРИТЬ УРОВЕНЬ</button>
-          <button class="nobt">СЛЕДУЮЩИЙ УРОВЕНЬ</button>
-      </div>
-      
+          <button class="yesbt">
+            <div class="yesbt_arrow"> &nbsp; </div>
+            <div class="yesbt_text">
+              ПОВТОРИТЬ УРОВЕНЬ
+            </div>
+          </button>
+          <button class="nobt">
+            <div class="nobt_text">
+                СЛЕДУЮЩИЙ УРОВЕНЬ
+            </div>
+          </button>
+      </div>  
   </div>
+  <div class="save_window">
+    <div class="save_window_topblock">
+      <p class="save_text">ОБНАРУЖЕНО НЕОКОНЧЕННОЕ УПРАЖНЕНИЕ</p>
+    </div>
+    <div class="save_window_bottomblock">
+        <button class="save_yesbt">
+          <div class="save_yesbt_text">
+             ПРОДОЛЖИТЬ УПРАЖНЕНИЕ
+          </div>
+        </button>
+        <button class="save_nobt">
+          <div class="save_nobt_text">
+              НАЧАТЬ СНАЧАЛА
+          </div>
+        </button>
+    </div>  
+</div>
   <canvas id="field" class="canvclass"></canvas>
   <select class="select-level">
     <option value="1" selected="selected">1</option>

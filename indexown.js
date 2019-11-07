@@ -3,8 +3,13 @@ var display = document.querySelector('.keyboard-display');
 var canvas = document.getElementById('field');
 var body = document.getElementById('body');
 var endwindow = document.querySelector(".level_end_window");
+var savewindow = document.querySelector(".save_window");
+savewindow.style.display = "none";
 var yes = document.querySelector(".yesbt");
 var no = document.querySelector(".nobt");
+var saveyes = document.querySelector(".save_yesbt");
+var saveno = document.querySelector(".save_nobt");
+var save = true //для работы диалога о сохранениях
 var ctx = canvas.getContext('2d');
 var width = ctx.canvas.width = window.innerWidth;
 var longscreen = window.innerHeight<=1080?false:true;
@@ -15,6 +20,7 @@ var pause = false;
 var coeffAccel = 1;//коэффициент ускорения воспроизведенеия
 var nextLevel = false;
 var povorotn = null;//
+var timecoeff = null;
 var prevAngle = 0;//для подчсета поворотов
 var userInput = "000";
 var userInputInt = 0;
@@ -121,6 +127,17 @@ var colors ={
   airportcol1: null,
   airportcol2: null,
 };
+var savefile={
+  plane: null,
+  planevel: null,
+  aimangle: null,
+  userangle: null,
+  aimveloc: null,
+  npovorot: null,
+  airports: null,
+  pathpoints: null,
+  level: null,
+};
 ctx.lineWidth = 1;
 ctx.font = "30px sans-serif";
 ctx.textAlign = 'center';
@@ -156,8 +173,14 @@ function init() {
 function draw(time) {
   if (progressBar.level!=6)
   {
+    if(localStorage.getItem("vectoring_save")&&save)
+    {
+      pause = true;
+      savewindow.style.display = "inline";
+    }
     if (!pause)
     {
+      save = false;
       document.querySelector(".right_sidebar").style.zIndex = 0;
       requestAnimationFrame(draw);
       ctx.clearRect(0, 0, width, height);
@@ -173,6 +196,25 @@ function draw(time) {
       drawMiniMap(miniMap);
       upgradeLevelInfo(airports);
       progressCheck(progressBar);
+      timecoeff++;
+      if (timecoeff>=200)
+      {
+        timecoeff = 0;
+        savefile.plane = airplane;
+        savefile.planevel = veloc;
+        savefile.aimangle = prevAngle;
+        savefile.userangle = userInputInt;
+        savefile.aimveloc = inputVeloc;
+        savefile.npovorot = povorotn;
+        savefile.airports = airports;
+        savefile.pathpoints = pathpoints;
+        savefile.level = progressBar.level;
+        localStorage.removeItem("vectoring_save");
+        savefile = JSON.stringify(savefile);
+        localStorage.setItem("vectoring_save",savefile);
+        savefile = JSON.parse(savefile);
+        console.log(savefile);
+      }
       upgradeInfo();
     }
     else
@@ -808,7 +850,7 @@ function upgradeInfo(){
   document.querySelector('.cren > span').innerHTML = "15";
   document.querySelector('.course > span').innerHTML = Math.floor(airplane.angle);
   document.querySelector('.speed > span').innerHTML = veloc;
-  document.querySelector('.info__ff__koef > span').innerHTML = coeffAccel;
+  document.querySelector('.info_ff_koef > span').innerHTML = coeffAccel;
 }
 
 function isNumPad(e) {
@@ -858,35 +900,35 @@ document.querySelector(".select-level").addEventListener("change",function(e){
   animation = requestAnimationFrame(draw);
 });
 
-document.querySelector('.info__control').addEventListener('click',function(e){
+document.querySelector('.info_control').addEventListener('click',function(e){
   var target =e.target;
-  if (target.className=="info__pause"&&!pause)
+  if (target.className=="info_pause"||target.className=="info_pause_button"&&!pause)
   {
     cancelAnimationFrame(animation);
     pause = true;
-    target.style.display = "none";
-    document.querySelector(".info__play").style.display = "inline-block";
+    document.querySelector(".info_pause").style.display = "none";
+    document.querySelector(".info_play").style.display = "inline-block";
   }
-  else if (document.querySelector(".info__pause").style.display=="none"&&target.className=="info__play")
+  else if (document.querySelector(".info_pause").style.display=="none"&&target.className=="info_play"||target.className=="info_play_button")
   {
     pause = false;
-    target.style.display = "none";
-    document.querySelector(".info__pause").style.display = "inline-block";
+    document.querySelector(".info_play").style.display = "none";
+    document.querySelector(".info_pause").style.display = "inline-block";
     animation = requestAnimationFrame(draw);
   }
 });
 
-document.querySelector(".info__speed").addEventListener("input",function(e){
+document.querySelector(".info_speed").addEventListener("input",function(e){
   if (!pause)
   {
-    document.querySelector('.info__speed__text').innerHTML = e.target.value;
-    document.querySelector(".info__speed").addEventListener("change",function(e){
+    document.querySelector('.info_speed_text').innerHTML = e.target.value;
+    document.querySelector(".info_speed").addEventListener("change",function(e){
     inputVeloc = e.target.value;
     });
   }
 });
 
-document.querySelector(".info__ff").addEventListener("click",function(e){
+document.querySelector(".info_ff").addEventListener("click",function(e){
   if (!pause)
   {
     coeffAccel++;
@@ -898,13 +940,14 @@ document.querySelector(".info__ff").addEventListener("click",function(e){
 });
 
 document.querySelector('.keyboard-container').addEventListener('click', function (e) {
-  if (document.querySelector(".info__pause").style.display!="none")
+  if (document.querySelector(".info_pause").style.display!="none"&&savewindow.style.display=="none")
   {
     if (e.target.value === 'reset') {
       userInput = '000';
     } else if (e.target.value === 'enter') {
       if (userInput >= 0 && userInput < 361) {
         userInputInt=parseInt(userInput);
+        userInput = "000";
         if (pause)
         {
           pause = false;
@@ -982,6 +1025,34 @@ no.addEventListener("click",function(e){
   }
 });
 
+saveyes.addEventListener("click", function(e){
+  save = false;
+  pause = false;
+  /*pause = true;
+  document.querySelector(".info_pause").style.display = "none";
+  document.querySelector(".info_play").style.display = "inline-block";*/
+  savefile = JSON.parse(localStorage.getItem("vectoring_save"));
+  airplane = savefile.plane;
+  veloc = savefile.planevel ;
+  prevAngle = savefile.aimangle;
+  userInputInt = savefile.userangle;
+  inputVeloc = savefile.aimveloc;
+  povorotn = savefile.npovorot;
+  airports = savefile.airports;
+  pathpoints = savefile.pathpoints;
+  progressBar.level = savefile.level;
+  savewindow.style.display = "none";
+  localStorage.removeItem("vectoring_save");
+});
+
+saveno.addEventListener("click", function(e){
+  save = false;
+  pause = false;
+  savewindow.style.display = "none";
+  localStorage.removeItem("vectoring_save");
+  animation = requestAnimationFrame(draw);
+});
+
 canvas.addEventListener("mousedown",function(e){
   if (e.clientX>miniMap.xb&&e.clientX<miniMap.xe&&e.clientY>miniMap.yb&&e.clientY<miniMap.ye)
   {
@@ -1018,6 +1089,7 @@ function levelChange(same){
   }
   pause = false;
   nextLevel = false;
+  timecoeff = 510;
   progressBar.count = 0; 
   airports.splice(0,airports.length);
   pathpoints.splice(0,pathpoints.length);
@@ -1025,11 +1097,12 @@ function levelChange(same){
 }
 
 document.addEventListener('keydown', function(e) {
-  if (document.querySelector(".info__pause").style.display!="none")
+  if (document.querySelector(".info_pause").style.display!="none"&&savewindow.style.display=="none")
   {
     if (e.which === 13) {
       if (userInput >= 0 && userInput < 361) {
         userInputInt=parseInt(userInput);
+        userInput = "000";
         if (pause)
         {
           pause = false;
