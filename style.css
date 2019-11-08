@@ -236,18 +236,49 @@
   
 }
 
-.keyboard-key {
+.keyboard-key_box{
   -webkit-flex-basis: 33.3%;
   flex-basis: 33.3%;
   -webkit-flex-shrink: 0;
   flex-shrink: 0;
   -webkit-flex-grow: 1;
   flex-grow: 1;
+}
+
+.keyboard-key1 {
+  position: relative;
+  height: 93%;
+  width: 90%;
+  top: 7%;
+  left: 10%;
   font-size: 1.1em;
   font-weight: 500;
   background-color: #dbdbdb;
   border: 1px solid transparent;
-  
+}
+
+.keyboard-key2 {
+  position: relative;
+  height: 93%;
+  width: 90%;
+  top: 7%;
+  left: 10%;
+  font-size: 1.1em;
+  font-weight: 500;
+  background-color: #dbdbdb;
+  border: 1px solid transparent;
+}
+
+.keyboard-key3 {
+  position: relative;
+  height: 93%;
+  width: 100%;
+  top: 7%;
+  left: 0px;
+  font-size: 1.1em;
+  font-weight: 500;
+  background-color: #dbdbdb;
+  border: 1px solid transparent;
 }
 
 .keyboard-display {
@@ -265,19 +296,19 @@
   font-family: sans-serif;
 }
 
-.info__ff:hover{
+.info_ff:hover{
   cursor: pointer;
 }
 
-.info__pause:hover{
+.info_pause:hover{
   cursor: pointer;
 }
 
-.info__play:hover{
+.info_play:hover{
   cursor: pointer;
 }
 
-.info__speed:hover{
+.info_speed:hover{
   cursor: pointer;
 }
 
@@ -287,7 +318,7 @@
   margin-bottom: 2%;
 }
 
-.info__parametrs p{
+.info_parametrs p{
   margin-left: 2%;
 }
 
@@ -309,13 +340,13 @@
   margin-top: 2%;
 }
 
-.levelsinfo__airports{
+.levelsinfo_airports{
   position: relative;
   top: 10px;
   background-color: #dbdbdb; 
 }
 
-.levelsinfo__airports p{
+.levelsinfo_airports p{
   margin-top: 2%;
   margin-right: 2%;
   margin-left: 2%;
@@ -539,21 +570,29 @@
     position: relative;
     height: 40%;
     font-size: 100%;
-    top: 0px;
+    top: 1%;
     left: 20px;
     font-family: 'Courier New', Courier, monospace;
     font-weight: 600;
   }
 
-  .info__control{
+  .info_control{
     top: 5%;
     height: 40%;
   }
 
+  .info_parametrs_text{
+    top: 10%;
+  }
+
+  .levelsinfo{
+    top: 1%;
+  }
+
   .keyboard{
-    position: absolute;
-    top:0%;
-    left:200%;
+    position: relative;
+    top: -91%;
+    left:130%;
     height:80%;
   }
   

@@ -12,7 +12,7 @@ var saveno = document.querySelector(".save_nobt");
 var save = true //для работы диалога о сохранениях
 var ctx = canvas.getContext('2d');
 var width = ctx.canvas.width = window.innerWidth;
-var longscreen = window.innerHeight<=1080?false:true;
+var longscreen = window.innerHeight<window.innerWidth?false:true;
 var height = ctx.canvas.height = window.innerHeight<window.innerWidth?window.innerHeight:window.innerHeight*0.8;
 var MAX = height>width?height:width;
 var MIN = height<width?height:width;
@@ -191,7 +191,14 @@ function draw(time) {
       outOfMap(airplane);
       drawPath(pathpoints);
       drawAp(airports);
-      drawScale(MIN/10,width/2,height-30);
+      if (!longscreen)
+      {
+        drawScale(MIN/10,width/2,height-30);
+      }
+      else
+      {
+        drawScale(MIN/10,30,height/2,longscreen);
+      }
       drawAirplane(airplane);
       drawMiniMap(miniMap);
       upgradeLevelInfo(airports);
@@ -1028,9 +1035,6 @@ no.addEventListener("click",function(e){
 saveyes.addEventListener("click", function(e){
   save = false;
   pause = false;
-  /*pause = true;
-  document.querySelector(".info_pause").style.display = "none";
-  document.querySelector(".info_play").style.display = "inline-block";*/
   savefile = JSON.parse(localStorage.getItem("vectoring_save"));
   airplane = savefile.plane;
   veloc = savefile.planevel ;
@@ -1043,6 +1047,7 @@ saveyes.addEventListener("click", function(e){
   progressBar.level = savefile.level;
   savewindow.style.display = "none";
   localStorage.removeItem("vectoring_save");
+  animation = requestAnimationFrame(draw);
 });
 
 saveno.addEventListener("click", function(e){
