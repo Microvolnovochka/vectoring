@@ -308,7 +308,11 @@
   cursor: pointer;
 }
 
-.info_speed:hover{
+.info_speed input:hover{
+  cursor: pointer;
+}
+
+.keyboard-container button{
   cursor: pointer;
 }
 

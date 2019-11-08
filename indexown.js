@@ -708,7 +708,7 @@ function collision(airport){
                 povorotn = 0;
               }
             }
-            else if(Math.abs(airplane.angle-airport.angle)<=10||Math.abs(airplane.angle-(airport.angle-180))<=10)
+            else if(Math.abs(airplane.angle-airport.angle)<=10||Math.abs(airplane.angle-(airport.angle-180))<=10||Math.abs((airplane.angle-180)-airport.angle)<=10)
             {
               airport.collision = true;
               airport.povorotn = povorotn;
